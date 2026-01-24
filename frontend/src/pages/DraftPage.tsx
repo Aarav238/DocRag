@@ -5,11 +5,11 @@ import { api } from '../api/client';
 import { DocumentList } from '../components/DocumentList';
 import { templates, type DocumentTemplate } from '../lib/templates';
 import { exportToPdf, exportToDocx, exportToMarkdown } from '../lib/exportUtils';
-import { demoDocuments } from '../lib/demoData';
+import { demoDocuments, type DemoDocument } from '../lib/demoData';
 import type { Document, DraftResponse } from '../api/types';
 
 // Demo documents as mock Document objects
-const mockDemoDocuments: Document[] = demoDocuments.map((doc, index) => ({
+const mockDemoDocuments: Document[] = demoDocuments.map((doc: DemoDocument, index: number) => ({
   doc_id: `demo-${index + 1}`,
   file_name: doc.name,
   file_type: 'application/pdf',
@@ -399,11 +399,11 @@ For questions or to proceed, please contact our team.
     setShowExportMenu(false);
   };
 
-  const groupedTemplates = {
-    proposal: templates.filter((t) => t.category === 'proposal'),
-    contract: templates.filter((t) => t.category === 'contract'),
-    report: templates.filter((t) => t.category === 'report'),
-    general: templates.filter((t) => t.category === 'general'),
+  const groupedTemplates: Record<string, DocumentTemplate[]> = {
+    proposal: templates.filter((t: DocumentTemplate) => t.category === 'proposal'),
+    contract: templates.filter((t: DocumentTemplate) => t.category === 'contract'),
+    report: templates.filter((t: DocumentTemplate) => t.category === 'report'),
+    general: templates.filter((t: DocumentTemplate) => t.category === 'general'),
   };
 
   return (
@@ -553,7 +553,7 @@ For questions or to proceed, please contact our team.
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Proposals</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {groupedTemplates.proposal.map((template) => (
+              {groupedTemplates.proposal.map((template: DocumentTemplate) => (
                 <button
                   key={template.id}
                   onClick={() => handleSelectTemplate(template)}
@@ -573,7 +573,7 @@ For questions or to proceed, please contact our team.
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Contracts</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {groupedTemplates.contract.map((template) => (
+              {groupedTemplates.contract.map((template: DocumentTemplate) => (
                 <button
                   key={template.id}
                   onClick={() => handleSelectTemplate(template)}
@@ -593,7 +593,7 @@ For questions or to proceed, please contact our team.
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Reports</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {groupedTemplates.report.map((template) => (
+              {groupedTemplates.report.map((template: DocumentTemplate) => (
                 <button
                   key={template.id}
                   onClick={() => handleSelectTemplate(template)}
@@ -613,7 +613,7 @@ For questions or to proceed, please contact our team.
           <div>
             <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Other</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {groupedTemplates.general.map((template) => (
+              {groupedTemplates.general.map((template: DocumentTemplate) => (
                 <button
                   key={template.id}
                   onClick={() => handleSelectTemplate(template)}
