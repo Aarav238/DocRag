@@ -83,9 +83,9 @@ const useCases = [
 
 const stats = [
   { value: '10x', label: 'Faster Drafts' },
-  { value: '50+', label: 'Doc Formats' },
+  { value: '8+', label: 'Templates' },
   { value: '100%', label: 'Source Citations' },
-  { value: '3', label: 'Export Options' },
+  { value: '3', label: 'Export Formats' },
 ];
 
 export function LandingPage() {
@@ -456,7 +456,8 @@ export function LandingPage() {
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-            Built with RAG technology — Your documents, intelligently analyzed
+            <p>Built with RAG technology — Your documents, intelligently analyzed</p>
+            <p className="mt-2 text-gray-500">&copy; {new Date().getFullYear()} DocRAG. All rights reserved.</p>
           </div>
         </div>
       </footer>
