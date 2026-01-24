@@ -2,6 +2,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 import asyncio
+import os
 from datetime import datetime
 
 from app.core.database import AsyncSessionLocal
@@ -114,6 +115,16 @@ async def process_document(doc_id: str):
             # Mark as indexed
             await update_status(db, doc.id, DocumentStatus.INDEXED)
             logger.info(f"Successfully indexed document: {doc.file_name}")
+
+            # Clean up: Delete the file after successful processing
+            # (Embeddings are stored in Pinecone, metadata in PostgreSQL)
+            if doc.file_path and os.path.exists(doc.file_path):
+                try:
+                    os.remove(doc.file_path)
+                    logger.info(f"Cleaned up file: {doc.file_path}")
+                except Exception as cleanup_error:
+                    # Don't fail if cleanup fails - the important data is already saved
+                    logger.warning(f"Failed to clean up file {doc.file_path}: {cleanup_error}")
 
         except Exception as e:
             logger.error(f"Error processing document {doc_id}: {e}")

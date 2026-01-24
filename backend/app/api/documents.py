@@ -147,9 +147,13 @@ async def delete_document(doc_id: str, db: AsyncSession = Depends(get_db)):
             import logging
             logging.getLogger(__name__).warning(f"Failed to delete vectors for {doc_id}: {e}")
 
-    # Delete file from disk
-    if os.path.exists(doc.file_path):
-        os.remove(doc.file_path)
+    # Delete file from disk (if it still exists - may have been cleaned up after processing)
+    if doc.file_path and os.path.exists(doc.file_path):
+        try:
+            os.remove(doc.file_path)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).warning(f"Failed to delete file {doc.file_path}: {e}")
 
     # Delete from database (cascades to chunks and pages)
     await db.delete(doc)
