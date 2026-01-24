@@ -4,8 +4,23 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
+# Use the database URL from settings (supports both SQLite and PostgreSQL)
+database_url = settings.get_database_url()
+
+# Debug: Print the database URL being used (mask password)
+if database_url:
+    if "@" in database_url:
+        # Mask password for security
+        parts = database_url.split("@")
+        masked_url = parts[0].rsplit(":", 1)[0] + ":***@" + parts[1]
+        print(f"[DATABASE] Using: {masked_url}")
+    else:
+        print(f"[DATABASE] Using: {database_url}")
+else:
+    print("[DATABASE] No database URL - this will fail!")
+
 engine = create_async_engine(
-    settings.database_url,
+    database_url,
     echo=settings.debug,
 )
 

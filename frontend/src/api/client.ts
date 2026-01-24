@@ -1,6 +1,8 @@
 import type { Document, SearchResponse, QAResponse, DraftResponse } from './types';
 
-const API_BASE = '/api';
+// Get backend URL from environment variable, fallback to /api for local dev proxy
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '/api';
+const API_BASE = BACKEND_URL;
 
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
