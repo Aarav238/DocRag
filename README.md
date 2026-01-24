@@ -51,7 +51,7 @@ A full-stack RAG (Retrieval-Augmented Generation) application for document analy
 ### Document Upload & Processing
 - **File Support**: PDF and DOCX files up to 50MB
 - **Text Extraction**: Intelligent extraction preserving page numbers
-- **Chunking**: Token-based chunking (600 tokens, 100 overlap) for optimal retrieval
+- **Chunking**: Token-based chunking for optimal retrieval
 - **Background Processing**: Non-blocking async ingestion pipeline
 
 ### Semantic Search
@@ -76,7 +76,7 @@ A full-stack RAG (Retrieval-Augmented Generation) application for document analy
 
 **Backend:**
 - FastAPI (Python 3.11+)
-- SQLAlchemy + SQLite (async)
+- PostgreSQL
 - Pinecone (vector storage - serverless)
 - OpenAI API (embeddings + chat)
 - pdfplumber, python-docx (extraction)
@@ -317,16 +317,6 @@ RULES:
 - **Context Window**: Limited by OpenAI model context length
 - **Pinecone Metadata**: Text stored in metadata is truncated to 1000 chars
 
-## Future Improvements
-
-- [ ] Support for more file types (TXT, MD, HTML)
-- [ ] Streaming responses for long generations
-- [ ] Document comparison feature
-- [ ] User authentication
-- [ ] Rate limiting and quotas
-- [ ] Celery for distributed background tasks
-- [ ] OCR support for scanned PDFs
-- [ ] Hybrid search (keyword + semantic)
 
 ## License
 
