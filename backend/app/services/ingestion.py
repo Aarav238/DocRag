@@ -3,6 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 import asyncio
 import os
+import tempfile
+import httpx
 from datetime import datetime
 
 from app.core.database import AsyncSessionLocal
@@ -17,6 +19,24 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 
+async def download_file_from_url(url: str, file_ext: str) -> str:
+    """Download a file from URL to a temporary location."""
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url, follow_redirects=True)
+        response.raise_for_status()
+
+        # Create temp file with proper extension
+        fd, temp_path = tempfile.mkstemp(suffix=f".{file_ext}")
+        try:
+            with os.fdopen(fd, 'wb') as f:
+                f.write(response.content)
+        except Exception:
+            os.close(fd)
+            raise
+
+        return temp_path
+
+
 async def process_document(doc_id: str):
     """
     Background task to process a document:
@@ -25,6 +45,8 @@ async def process_document(doc_id: str):
     3. Generate embeddings
     4. Store in vector DB
     """
+    temp_file_path = None  # Track temp file for cleanup
+
     async with AsyncSessionLocal() as db:
         try:
             # Get document
@@ -37,10 +59,20 @@ async def process_document(doc_id: str):
 
             logger.info(f"Processing document: {doc.file_name}")
 
+            # Determine file path - download from URL if needed
+            if doc.file_url:
+                # File is in UploadThing - download to temp location
+                logger.info(f"Downloading file from UploadThing: {doc.file_url}")
+                temp_file_path = await download_file_from_url(doc.file_url, doc.file_type)
+                file_path = temp_file_path
+            else:
+                # Legacy local file
+                file_path = doc.file_path
+
             # Step 1: Extract text
             await update_status(db, doc.id, DocumentStatus.EXTRACTING)
             extractor = TextExtractor()
-            pages = await extractor.extract(doc.file_path, doc.file_type)
+            pages = await extractor.extract(file_path, doc.file_type)
 
             if not pages:
                 raise ValueError("No text could be extracted from document")
@@ -116,16 +148,6 @@ async def process_document(doc_id: str):
             await update_status(db, doc.id, DocumentStatus.INDEXED)
             logger.info(f"Successfully indexed document: {doc.file_name}")
 
-            # Clean up: Delete the file after successful processing
-            # (Embeddings are stored in Pinecone, metadata in PostgreSQL)
-            if doc.file_path and os.path.exists(doc.file_path):
-                try:
-                    os.remove(doc.file_path)
-                    logger.info(f"Cleaned up file: {doc.file_path}")
-                except Exception as cleanup_error:
-                    # Don't fail if cleanup fails - the important data is already saved
-                    logger.warning(f"Failed to clean up file {doc.file_path}: {cleanup_error}")
-
         except Exception as e:
             logger.error(f"Error processing document {doc_id}: {e}")
             async with AsyncSessionLocal() as error_db:
@@ -139,6 +161,15 @@ async def process_document(doc_id: str):
                     )
                 )
                 await error_db.commit()
+
+        finally:
+            # Clean up temp file if we downloaded from URL
+            if temp_file_path and os.path.exists(temp_file_path):
+                try:
+                    os.remove(temp_file_path)
+                    logger.info(f"Cleaned up temp file: {temp_file_path}")
+                except Exception as e:
+                    logger.warning(f"Failed to clean up temp file {temp_file_path}: {e}")
 
 
 async def update_status(db: AsyncSession, doc_id: str, status: DocumentStatus):

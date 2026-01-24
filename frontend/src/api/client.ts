@@ -43,6 +43,16 @@ export const api = {
     return handleResponse(response);
   },
 
+  // Get URL to download a document
+  getDocumentDownloadUrl(docId: string): string {
+    return `${API_BASE}/documents/${docId}/download`;
+  },
+
+  // Get URL to view a document inline (PDF)
+  getDocumentViewUrl(docId: string): string {
+    return `${API_BASE}/documents/${docId}/view`;
+  },
+
   // Search
   async search(query: string, docIds?: string[], topK: number = 5): Promise<SearchResponse> {
     const params = new URLSearchParams({ q: query, top_k: String(topK) });

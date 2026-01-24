@@ -27,6 +27,9 @@ class Settings(BaseSettings):
     max_file_size_mb: int = 50
     allowed_extensions: set = {"pdf", "docx"}
 
+    # UploadThing (Cloud Storage)
+    uploadthing_token: str = ""  # Optional - if not set, files are stored locally
+
     # Database
     # Read from DATABASE_URL or database_url in .env file
     # If not set, defaults to SQLite for local development

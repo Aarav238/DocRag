@@ -21,7 +21,8 @@ class Document(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     file_name = Column(String(255), nullable=False)
-    file_path = Column(String(500), nullable=False)
+    file_path = Column(String(500), nullable=True)  # Local path (temporary during processing)
+    file_url = Column(String(1000), nullable=True)  # UploadThing URL (permanent storage)
     file_type = Column(String(10), nullable=False)
     file_size = Column(Integer, nullable=False)
     status = Column(Enum(DocumentStatus), default=DocumentStatus.UPLOADED)
