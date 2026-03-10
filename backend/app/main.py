@@ -6,7 +6,7 @@ import logging
 import time
 
 from app.core.config import get_settings, ensure_directories
-from app.core.database import init_db
+from app.core.database import init_db, close_db
 from app.core.logging import setup_logging, metrics
 from app.core.exceptions import AppException, to_http_exception
 from app.core.cache import embedding_cache, search_cache
@@ -32,6 +32,7 @@ async def lifespan(app: FastAPI):
     yield
 
     logger.info("Shutting down...")
+    await close_db()
 
 
 app = FastAPI(
