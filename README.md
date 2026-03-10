@@ -32,10 +32,11 @@ A full-stack RAG (Retrieval-Augmented Generation) application for document analy
         │                                                    │
         ▼                                                    ▼
 ┌───────────────────┐                              ┌───────────────────┐
-│   SQLite DB       │                              │  Pinecone Cloud   │
-│   - Documents     │                              │   - Embeddings    │
-│   - Pages         │                              │   - Metadata      │
-│   - Chunks        │                              │   - Serverless    │
+│   MongoDB         │                              │  Pinecone Cloud   │
+│   DB: docRag      │                              │   - Embeddings    │
+│   - documents     │                              │   - Metadata      │
+│   - document_pages│                              │   - Serverless    │
+│   - chunks        │                              │                   │
 └───────────────────┘                              └───────────────────┘
                                     │
                                     ▼
@@ -76,7 +77,7 @@ A full-stack RAG (Retrieval-Augmented Generation) application for document analy
 
 **Backend:**
 - FastAPI (Python 3.11+)
-- PostgreSQL
+- MongoDB (database: `docRag`) via Motor (async driver)
 - Pinecone (vector storage - serverless)
 - OpenAI API (embeddings + chat)
 - pdfplumber, python-docx (extraction)
@@ -104,8 +105,8 @@ A full-stack RAG (Retrieval-Augmented Generation) application for document analy
 │   │   │   ├── cache.py      # TTL caching
 │   │   │   ├── logging.py    # Logging & metrics
 │   │   │   └── exceptions.py # Custom exceptions
-│   │   ├── models/           # SQLAlchemy models
-│   │   │   └── document.py   # Document, Page, Chunk
+│   │   ├── models/           # Data models
+│   │   │   └── document.py   # DocumentStatus enum
 │   │   ├── services/         # Business logic
 │   │   │   ├── extractor.py  # Text extraction
 │   │   │   ├── chunker.py    # Text chunking
@@ -133,6 +134,7 @@ A full-stack RAG (Retrieval-Augmented Generation) application for document analy
 ### Prerequisites
 - Python 3.11+
 - Node.js 18+
+- MongoDB instance (local or cloud e.g. MongoDB Atlas)
 - OpenAI API key
 - Pinecone API key (free tier available at https://www.pinecone.io)
 
@@ -150,7 +152,10 @@ pip install -r requirements.txt
 
 # Configure environment
 cp .env.example .env
-# Edit .env and add your OPENAI_API_KEY and PINECONE_API_KEY
+# Edit .env and set:
+#   OPENAI_API_KEY=...
+#   PINECONE_API_KEY=...
+#   MONGODB_URL=mongodb+srv://<user>:<pass>@cluster.mongodb.net/
 
 # Run the server
 uvicorn app.main:app --reload --port 8000
@@ -308,6 +313,64 @@ RULES:
 4. Maintain consistent professional tone
 5. Use Markdown formatting with ## headers
 ```
+
+## Database — MongoDB
+
+The backend uses **MongoDB** (database name: `docRag`) via the **Motor** async driver.
+
+### Collections
+
+**`documents`**
+| Field | Type | Description |
+|-------|------|-------------|
+| `_id` | string (UUID) | Document ID |
+| `file_name` | string | Original filename |
+| `file_path` | string \| null | Local path (fallback storage) |
+| `file_url` | string \| null | UploadThing cloud URL |
+| `file_type` | string | `pdf` or `docx` |
+| `file_size` | int | Size in bytes |
+| `status` | string | `uploaded` → `extracting` → `chunking` → `embedding` → `indexed` \| `failed` |
+| `error_message` | string \| null | Set on failure |
+| `created_at` | datetime | |
+| `updated_at` | datetime | Updated on every status change |
+
+**`document_pages`**
+| Field | Type | Description |
+|-------|------|-------------|
+| `_id` | string (UUID) | Page ID |
+| `document_id` | string | Reference to `documents._id` |
+| `page_number` | int | Page number |
+| `raw_text` | string | Extracted page text |
+| `created_at` | datetime | |
+
+**`chunks`**
+| Field | Type | Description |
+|-------|------|-------------|
+| `_id` | string (UUID) | Chunk ID |
+| `document_id` | string | Reference to `documents._id` |
+| `chunk_index` | int | Sequential index within document |
+| `text` | string | Chunk text |
+| `token_count` | int | OpenAI token count |
+| `page_start` | int \| null | Starting page |
+| `page_end` | int \| null | Ending page |
+| `created_at` | datetime | |
+
+### Indexes
+
+Created automatically on startup:
+- `documents.created_at`, `documents.status`
+- `document_pages.document_id`
+- `chunks.document_id`
+
+### Environment Variable
+
+```env
+MONGODB_URL=mongodb+srv://<user>:<pass>@cluster.mongodb.net/
+```
+
+The database name `docRag` is hardcoded in `app/core/database.py`.
+
+---
 
 ## Limitations
 
