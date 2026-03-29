@@ -13,10 +13,8 @@ export function MarketingHeader({ showTryDemo = true }: MarketingHeaderProps) {
       <div className="mx-auto max-w-7xl px-6 lg:px-8 flex items-center justify-between h-16 gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-          <div className="w-8 h-8 rounded-lg bg-sidebar flex items-center justify-center shadow-lg shadow-violet-500/10 transition-transform group-hover:scale-105">
-            <div className="w-4 h-4 rounded-full border-2 border-cyan-400 relative">
-              <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-cyan-400" />
-            </div>
+          <div className="w-8 h-8 rounded-lg primary-gradient flex items-center justify-center shadow-lg shadow-violet-500/15 transition-transform group-hover:scale-105">
+            <span className="text-white text-sm font-black font-headline">D</span>
           </div>
           <span className="font-headline text-xl font-extrabold tracking-tight text-neutral-900">DocRAG</span>
         </Link>

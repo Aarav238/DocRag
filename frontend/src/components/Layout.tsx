@@ -63,19 +63,17 @@ export function Layout({ children }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-background text-on-surface flex">
-      {/* ── Dark Sidebar ── */}
-      <aside className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col bg-sidebar py-6 dark-scroll">
+      {/* ── Light Sidebar ── */}
+      <aside className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-neutral-200/70 bg-white py-6">
         {/* Logo */}
         <div className="mb-8 px-6 animate-fade-in">
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 shadow-lg shadow-violet-500/25 transition-transform group-hover:scale-105">
-              <div className="w-5 h-5 rounded-full border-2 border-white/80 relative">
-                <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white" />
-              </div>
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl primary-gradient shadow-lg shadow-violet-500/20 transition-transform group-hover:scale-105">
+              <span className="text-white text-base font-black font-headline">D</span>
             </div>
             <div>
-              <h1 className="font-headline text-lg font-black leading-tight text-white">DocRAG</h1>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cyan-400/80">Intelligence</p>
+              <h1 className="font-headline text-lg font-black leading-tight text-neutral-900">DocRAG</h1>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-500">Intelligence</p>
             </div>
           </Link>
         </div>
@@ -90,48 +88,39 @@ export function Layout({ children }: LayoutProps) {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative mx-1 flex items-center rounded-xl px-4 py-3 transition-all duration-200 ease-out group animate-slide-in-left`}
+                className={`relative mx-1 flex items-center rounded-xl px-4 py-3 transition-all duration-200 ease-out group animate-slide-in-left ${
+                  isActive
+                    ? 'bg-violet-50 text-violet-700'
+                    : 'text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800'
+                }`}
                 style={{ animationDelay: `${i * 60}ms` }}
               >
                 {/* Active indicator bar */}
                 {isActive && (
-                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-violet-400 to-cyan-400" />
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-violet-500" />
                 )}
 
-                <div
-                  className={`flex items-center gap-3 w-full ${
-                    isActive
-                      ? 'text-white'
-                      : 'text-slate-400 hover:text-slate-200'
+                <span
+                  className={`material-symbols-outlined text-[22px] mr-3 ${
+                    isActive ? 'text-violet-600' : 'text-neutral-400 group-hover:text-neutral-600'
                   }`}
+                  style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
                 >
-                  <span
-                    className={`material-symbols-outlined text-[22px] ${
-                      isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'
-                    }`}
-                    style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
-                  >
-                    {item.icon}
-                  </span>
-                  <span className={`text-sm ${isActive ? 'font-bold' : 'font-medium'}`}>
-                    {item.label}
-                  </span>
-                </div>
-
-                {/* Active bg */}
-                {isActive && (
-                  <div className="absolute inset-0 rounded-xl bg-white/[0.06] pointer-events-none" />
-                )}
+                  {item.icon}
+                </span>
+                <span className={`text-sm ${isActive ? 'font-bold' : 'font-medium'}`}>
+                  {item.label}
+                </span>
               </Link>
             );
           })}
         </nav>
 
         {/* Bottom actions */}
-        <div className="mt-auto border-t border-slate-700/40 px-5 pt-5">
+        <div className="mt-auto border-t border-neutral-100 px-5 pt-5">
           <Link
             to="/upload"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/20 transition-all hover:shadow-xl hover:shadow-violet-500/30 hover:-translate-y-px"
+            className="flex w-full items-center justify-center gap-2 rounded-xl primary-gradient py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/20 transition-all hover:shadow-xl hover:shadow-violet-500/25 hover:-translate-y-px"
           >
             <span className="material-symbols-outlined text-sm">add</span>
             New Analysis
@@ -139,14 +128,14 @@ export function Layout({ children }: LayoutProps) {
           <div className="mt-4 space-y-0.5">
             <Link
               to="/guide"
-              className="flex items-center gap-2.5 px-2 py-2.5 text-xs text-slate-500 transition-colors hover:text-slate-300 rounded-lg"
+              className="flex items-center gap-2.5 px-2 py-2.5 text-xs text-neutral-400 transition-colors hover:text-neutral-600 rounded-lg"
             >
               <span className="material-symbols-outlined text-[18px]">settings</span>
               Settings
             </Link>
             <a
-              href="mailto:support@example.com"
-              className="flex items-center gap-2.5 px-2 py-2.5 text-xs text-slate-500 transition-colors hover:text-slate-300 rounded-lg"
+              href="mailto:aarav8090shukla@gmail.com"
+              className="flex items-center gap-2.5 px-2 py-2.5 text-xs text-neutral-400 transition-colors hover:text-neutral-600 rounded-lg"
             >
               <span className="material-symbols-outlined text-[18px]">help</span>
               Support

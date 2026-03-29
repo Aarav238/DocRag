@@ -59,10 +59,8 @@ export function SignInPage() {
           <div className="absolute inset-0 dot-grid-dark z-[1]" />
           <div className="relative z-10 max-w-lg">
             <div className="mb-6 flex items-center gap-3">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-cyan-500 shadow-lg shadow-violet-500/25">
-                <div className="w-5 h-5 rounded-full border-2 border-white/80 relative">
-                  <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-white" />
-                </div>
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl primary-gradient shadow-lg shadow-violet-500/25">
+                <span className="text-white text-xl font-black font-headline">D</span>
               </div>
               <span className="font-headline text-2xl font-black tracking-tight text-white">DocRAG</span>
             </div>

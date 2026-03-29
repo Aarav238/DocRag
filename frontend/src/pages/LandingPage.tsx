@@ -286,20 +286,20 @@ export function LandingPage() {
               {/* App UI */}
               <div className="flex h-[340px]">
                 {/* Mini dark sidebar */}
-                <div className="w-14 bg-sidebar flex flex-col items-center py-3 gap-1 flex-shrink-0">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center mb-3">
-                    <div className="w-3 h-3 rounded-full border-[1.5px] border-white" />
+                <div className="w-14 bg-neutral-50 border-r border-neutral-100 flex flex-col items-center py-3 gap-1 flex-shrink-0">
+                  <div className="w-7 h-7 rounded-md primary-gradient flex items-center justify-center mb-3">
+                    <span className="text-white text-[8px] font-black">D</span>
                   </div>
                   {['upload_file', 'search', 'chat', 'edit_note', 'auto_stories'].map((icon, i) => (
                     <div
                       key={icon}
                       className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                        i === 2 ? 'bg-white/10' : ''
+                        i === 2 ? 'bg-violet-50' : ''
                       }`}
                     >
                       <span
                         className={`material-symbols-outlined text-[16px] ${
-                          i === 2 ? 'text-cyan-400' : 'text-slate-500'
+                          i === 2 ? 'text-violet-600' : 'text-neutral-400'
                         }`}
                         style={i === 2 ? { fontVariationSettings: "'FILL' 1" } : undefined}
                       >
@@ -503,10 +503,8 @@ answer = llm.chat(
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-8 h-8 rounded-lg bg-sidebar flex items-center justify-center">
-                  <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-cyan-400 relative">
-                    <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                  </div>
+                <div className="w-8 h-8 rounded-lg primary-gradient flex items-center justify-center shadow-sm">
+                  <span className="text-white text-sm font-black font-headline">D</span>
                 </div>
                 <span className="font-headline text-lg font-black text-neutral-900">DocRAG</span>
               </div>
