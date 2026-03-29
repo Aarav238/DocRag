@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
-import { DocumentList } from '../components/DocumentList';
 import type { Document, SearchResult } from '../api/types';
 
 export function SearchPage() {
