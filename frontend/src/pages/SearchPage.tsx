@@ -66,10 +66,13 @@ export function SearchPage() {
           <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
           {/* Search input container */}
-          <div className="relative flex items-center p-2 bg-surface-container-lowest shadow-xl rounded-2xl border border-outline-variant/20">
-            <span className="material-symbols-outlined text-indigo-400 ml-4 mr-2 text-2xl ai-pulse">
-              auto_awesome
-            </span>
+          <div className="relative flex items-center gap-3 p-2 pl-3 bg-surface-container-lowest shadow-xl rounded-2xl border border-outline-variant/20">
+            <div
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-100 ring-1 ring-indigo-200/60"
+              aria-hidden
+            >
+              <span className="material-symbols-outlined text-[22px] text-indigo-700 leading-none">find_in_page</span>
+            </div>
             <input
               type="text"
               value={query}
