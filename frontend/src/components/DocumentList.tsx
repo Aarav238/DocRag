@@ -8,10 +8,9 @@ interface DocumentListProps {
   selectable?: boolean;
   selectedIds?: string[];
   onSelectionChange?: (ids: string[]) => void;
-  compact?: boolean; // Compact mode for sidebars
+  compact?: boolean;
 }
 
-// Delete Confirmation Modal
 function DeleteConfirmModal({
   fileName,
   isDeleting,
@@ -24,43 +23,37 @@ function DeleteConfirmModal({
   onCancel: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
+    <div className="fixed inset-0 z-50 flex items-center justify-center animate-fade-in">
       <div
-        className="absolute inset-0 bg-indigo-950/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-neutral-900/40 backdrop-blur-sm"
         onClick={!isDeleting ? onCancel : undefined}
       />
-
-      {/* Modal */}
-      <div className="relative bg-surface-container-lowest rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden p-8">
-        {/* Header */}
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden p-8 animate-scale-in">
         <div className="pb-4">
-          <div className="w-14 h-14 rounded-full bg-error-container flex items-center justify-center mx-auto mb-4">
-            <span className="material-symbols-outlined text-error text-3xl">warning</span>
+          <div className="w-14 h-14 rounded-2xl bg-red-50 border border-red-100/50 flex items-center justify-center mx-auto mb-4">
+            <span className="material-symbols-outlined text-red-500 text-3xl">warning</span>
           </div>
-          <h3 className="font-headline text-2xl font-bold text-on-surface text-center">Delete Document</h3>
-          <p className="text-sm text-on-surface-variant text-center mt-2">
+          <h3 className="font-headline text-2xl font-black text-neutral-900 text-center">Delete Document</h3>
+          <p className="text-sm text-neutral-500 text-center mt-2">
             Are you sure you want to delete{' '}
-            <span className="font-medium text-on-surface">"{fileName}"</span>?
+            <span className="font-bold text-neutral-800">"{fileName}"</span>?
           </p>
-          <p className="text-xs text-on-surface-variant/70 text-center mt-2">
+          <p className="text-xs text-neutral-400 text-center mt-2">
             This will permanently remove the document and all its indexed data.
           </p>
         </div>
-
-        {/* Actions */}
         <div className="flex gap-3 pt-4">
           <button
             onClick={onCancel}
             disabled={isDeleting}
-            className="flex-1 px-4 py-2.5 text-sm font-bold text-on-surface-variant bg-surface-container-high rounded-lg hover:bg-surface-container-highest transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex-1 px-4 py-2.5 text-sm font-bold text-neutral-600 bg-neutral-100 rounded-xl hover:bg-neutral-200 transition-colors disabled:opacity-50 cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isDeleting}
-            className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-error rounded-lg shadow-lg shadow-error/20 hover:bg-error/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-red-600 rounded-xl shadow-lg shadow-red-500/20 hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
           >
             {isDeleting ? (
               <>
@@ -81,42 +74,12 @@ function DeleteConfirmModal({
 }
 
 const statusConfig: Record<string, { color: string; bgColor: string; label: string; icon: string }> = {
-  uploaded: {
-    color: 'text-amber-700',
-    bgColor: 'bg-amber-50',
-    label: 'Queued',
-    icon: 'clock',
-  },
-  extracting: {
-    color: 'text-indigo-600',
-    bgColor: 'bg-indigo-50',
-    label: 'Extracting text...',
-    icon: 'document',
-  },
-  chunking: {
-    color: 'text-indigo-700',
-    bgColor: 'bg-indigo-50',
-    label: 'Chunking...',
-    icon: 'scissors',
-  },
-  embedding: {
-    color: 'text-purple-700',
-    bgColor: 'bg-purple-50',
-    label: 'Creating embeddings...',
-    icon: 'sparkles',
-  },
-  indexed: {
-    color: 'text-green-700',
-    bgColor: 'bg-green-50',
-    label: 'Ready',
-    icon: 'check',
-  },
-  failed: {
-    color: 'text-error',
-    bgColor: 'bg-error-container',
-    label: 'Failed',
-    icon: 'x',
-  },
+  uploaded: { color: 'text-amber-700', bgColor: 'bg-amber-50 border border-amber-200/50', label: 'Queued', icon: 'clock' },
+  extracting: { color: 'text-violet-600', bgColor: 'bg-violet-50 border border-violet-200/50', label: 'Extracting...', icon: 'document' },
+  chunking: { color: 'text-violet-700', bgColor: 'bg-violet-50 border border-violet-200/50', label: 'Chunking...', icon: 'scissors' },
+  embedding: { color: 'text-cyan-700', bgColor: 'bg-cyan-50 border border-cyan-200/50', label: 'Embedding...', icon: 'sparkles' },
+  indexed: { color: 'text-emerald-700', bgColor: 'bg-emerald-50 border border-emerald-200/50', label: 'Ready', icon: 'check' },
+  failed: { color: 'text-red-600', bgColor: 'bg-red-50 border border-red-200/50', label: 'Failed', icon: 'x' },
 };
 
 function StatusIcon({ status }: { status: string }) {
@@ -124,12 +87,10 @@ function StatusIcon({ status }: { status: string }) {
 
   if (isProcessing) {
     return (
-      <div className="relative">
-        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-      </div>
+      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+      </svg>
     );
   }
 
@@ -152,33 +113,24 @@ function StatusIcon({ status }: { status: string }) {
   return null;
 }
 
-// Helper to get clean file extension
 function getFileExtension(fileType: string, fileName?: string): string {
-  // Try to extract from filename first
   if (fileName) {
     const ext = fileName.split('.').pop()?.toLowerCase();
     if (ext) return ext;
   }
-  // Handle MIME types
   if (fileType.includes('pdf')) return 'pdf';
   if (fileType.includes('docx') || fileType.includes('wordprocessingml')) return 'docx';
   if (fileType.includes('doc')) return 'doc';
-  // Default to the file type or extract extension
   return fileType.split('/').pop() || fileType;
 }
 
 function FileIcon({ fileType }: { fileType: string }) {
   const isPdf = fileType.includes('pdf');
-  if (isPdf) {
-    return (
-      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-        <span className="material-symbols-outlined text-primary text-2xl">description</span>
-      </div>
-    );
-  }
   return (
-    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-      <span className="material-symbols-outlined text-primary text-2xl">article</span>
+    <div className="w-12 h-12 rounded-xl bg-violet-50 border border-violet-100/50 flex items-center justify-center">
+      <span className="material-symbols-outlined text-violet-500 text-2xl">
+        {isPdf ? 'description' : 'article'}
+      </span>
     </div>
   );
 }
@@ -193,10 +145,10 @@ export function DocumentList({
 }: DocumentListProps) {
   const [deleteTarget, setDeleteTarget] = useState<Document | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [busyDocId, setBusyDocId] = useState<string | null>(null);
 
   const toggleSelection = (docId: string) => {
     if (!onSelectionChange) return;
-
     if (selectedIds.includes(docId)) {
       onSelectionChange(selectedIds.filter((id) => id !== docId));
     } else {
@@ -211,7 +163,6 @@ export function DocumentList({
 
   const handleDeleteConfirm = async () => {
     if (!deleteTarget || !onDelete) return;
-
     setIsDeleting(true);
     try {
       await onDelete(deleteTarget.doc_id);
@@ -222,27 +173,24 @@ export function DocumentList({
   };
 
   const handleDeleteCancel = () => {
-    if (!isDeleting) {
-      setDeleteTarget(null);
-    }
+    if (!isDeleting) setDeleteTarget(null);
   };
 
   if (documents.length === 0) {
     return (
       <div className="text-center py-16">
-        <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mx-auto mb-4">
-          <span className="material-symbols-outlined text-on-surface-variant text-3xl">description</span>
+        <div className="w-16 h-16 rounded-2xl bg-neutral-100 border border-neutral-200/50 flex items-center justify-center mx-auto mb-4">
+          <span className="material-symbols-outlined text-neutral-400 text-3xl">description</span>
         </div>
-        <p className="text-on-surface-variant font-medium">No documents uploaded yet</p>
-        <p className="text-sm text-on-surface-variant/70 mt-1">Upload a PDF or DOCX to get started</p>
+        <p className="text-neutral-600 font-medium">No documents uploaded yet</p>
+        <p className="text-sm text-neutral-400 mt-1">Upload a PDF or DOCX to get started</p>
       </div>
     );
   }
 
-  // Compact mode for sidebars (Chat page)
   if (compact) {
     return (
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {documents.map((doc) => {
           const isSelected = selectedIds.includes(doc.doc_id);
           const canSelect = selectable && doc.status === 'indexed';
@@ -255,19 +203,18 @@ export function DocumentList({
                 canSelect ? 'cursor-pointer' : ''
               } ${
                 isSelected
-                  ? 'border-primary bg-primary-fixed/20 shadow-sm'
-                  : 'border-outline-variant/10 bg-surface-container-lowest hover:border-primary/30 hover:bg-surface-container-low'
+                  ? 'border-violet-300 bg-violet-50/40 shadow-sm'
+                  : 'border-neutral-100 bg-white hover:border-violet-200 hover:bg-violet-50/20'
               }`}
               onClick={() => canSelect && toggleSelection(doc.doc_id)}
             >
               <div className="flex items-center gap-3">
-                {/* Checkbox */}
                 {canSelect && (
                   <div
                     className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                       isSelected
-                        ? 'bg-primary border-primary'
-                        : 'border-primary/40 group-hover:border-primary'
+                        ? 'bg-violet-600 border-violet-600'
+                        : 'border-neutral-300 group-hover:border-violet-400'
                     }`}
                   >
                     {isSelected && (
@@ -278,19 +225,17 @@ export function DocumentList({
                   </div>
                 )}
 
-                {/* Small file icon */}
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-primary/10">
-                  <span className="material-symbols-outlined text-primary text-lg">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-violet-50">
+                  <span className="material-symbols-outlined text-violet-500 text-lg">
                     {isPdf ? 'description' : 'article'}
                   </span>
                 </div>
 
-                {/* File info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-on-surface truncate" title={doc.file_name}>
+                  <p className="text-sm font-medium text-neutral-800 truncate" title={doc.file_name}>
                     {doc.file_name}
                   </p>
-                  <p className="text-xs text-on-surface-variant">
+                  <p className="text-xs text-neutral-400">
                     {getFileExtension(doc.file_type, doc.file_name).toUpperCase()} · {new Date(doc.created_at).toLocaleString('en-IN', {
                       month: 'short',
                       day: 'numeric',
@@ -299,23 +244,31 @@ export function DocumentList({
                   </p>
                 </div>
 
-                {/* View button */}
                 {doc.status === 'indexed' && (
-                  <a
-                    href={api.getDocumentViewUrl(doc.doc_id)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant/50 hover:text-primary hover:bg-primary/10 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                  <button
+                    type="button"
+                    disabled={busyDocId === doc.doc_id}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setBusyDocId(doc.doc_id);
+                      try {
+                        await api.openDocumentView(doc.doc_id);
+                      } catch (err) {
+                        console.error(err);
+                        alert(err instanceof Error ? err.message : 'Could not open document');
+                      } finally {
+                        setBusyDocId(null);
+                      }
+                    }}
+                    className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-neutral-400 hover:text-violet-500 hover:bg-violet-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer disabled:opacity-40"
                     title="View document"
                   >
                     <span className="material-symbols-outlined text-[18px] leading-none">visibility</span>
-                  </a>
+                  </button>
                 )}
 
-                {/* Selection indicator */}
                 {isSelected && (
-                  <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-violet-500 flex-shrink-0" />
                 )}
               </div>
             </div>
@@ -325,10 +278,9 @@ export function DocumentList({
     );
   }
 
-  // Normal mode (Upload page, Draft page)
   return (
     <div className="space-y-3">
-      {documents.map((doc) => {
+      {documents.map((doc, i) => {
         const config = statusConfig[doc.status] || statusConfig.failed;
         const isProcessing = ['uploaded', 'extracting', 'chunking', 'embedding'].includes(doc.status);
         const isSelected = selectedIds.includes(doc.doc_id);
@@ -337,31 +289,31 @@ export function DocumentList({
         return (
           <div
             key={doc.doc_id}
-            className={`group relative bg-surface-container-lowest rounded-2xl border p-4 transition-all duration-200 ${
+            className={`group relative bg-white rounded-2xl border p-5 transition-all duration-200 card-hover animate-fade-in-up ${
               canSelect ? 'cursor-pointer' : ''
             } ${
               isSelected
-                ? 'border-primary bg-primary-fixed/10 shadow-md shadow-primary/10'
-                : 'border-outline-variant/10 hover:border-outline-variant/20 shadow-sm hover:shadow-md'
-            } ${isProcessing ? 'animate-pulse' : ''}`}
+                ? 'border-violet-300 bg-violet-50/20 shadow-md shadow-violet-500/5'
+                : 'border-neutral-200/60 shadow-sm'
+            }`}
+            style={{ animationDelay: `${i * 50}ms` }}
             onClick={() => canSelect && toggleSelection(doc.doc_id)}
           >
-            {/* Processing overlay shimmer */}
+            {/* Processing shimmer */}
             {isProcessing && (
               <div className="absolute inset-0 rounded-2xl overflow-hidden">
-                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+                <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/50 to-transparent" />
               </div>
             )}
 
             <div className="relative flex items-center gap-4">
-              {/* Selection checkbox */}
               {canSelect && (
                 <div className="flex-shrink-0">
                   <div
                     className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-primary border-primary'
-                        : 'border-outline-variant group-hover:border-primary'
+                        ? 'bg-violet-600 border-violet-600'
+                        : 'border-neutral-300 group-hover:border-violet-400'
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -377,15 +329,13 @@ export function DocumentList({
                 </div>
               )}
 
-              {/* File icon */}
               <FileIcon fileType={doc.file_type} />
 
-              {/* File info */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-on-surface truncate" title={doc.file_name}>
+                <p className="font-bold text-neutral-900 truncate" title={doc.file_name}>
                   {doc.file_name}
                 </p>
-                <p className="text-xs text-on-surface-variant mt-1">
+                <p className="text-xs text-neutral-400 mt-1">
                   {getFileExtension(doc.file_type, doc.file_name).toUpperCase()} · {new Date(doc.created_at).toLocaleString('en-IN', {
                     month: 'short',
                     day: 'numeric',
@@ -397,45 +347,61 @@ export function DocumentList({
                 </p>
               </div>
 
-              {/* Status badge */}
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${config.bgColor} ${config.color}`}>
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${config.bgColor} ${config.color}`}>
                 <StatusIcon status={doc.status} />
-                <span className="text-sm font-medium whitespace-nowrap">{config.label}</span>
+                <span className="text-sm font-bold whitespace-nowrap">{config.label}</span>
               </div>
 
-              {/* Action buttons */}
               {doc.status === 'indexed' && (
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {/* View button (PDF only) */}
                   {doc.file_type.includes('pdf') && (
-                    <a
-                      href={api.getDocumentViewUrl(doc.doc_id)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                    <button
+                      type="button"
+                      disabled={busyDocId === doc.doc_id}
+                      onClick={async (e) => {
+                        e.stopPropagation();
+                        setBusyDocId(doc.doc_id);
+                        try {
+                          await api.openDocumentView(doc.doc_id);
+                        } catch (err) {
+                          console.error(err);
+                          alert(err instanceof Error ? err.message : 'Could not open document');
+                        } finally {
+                          setBusyDocId(null);
+                        }
+                      }}
+                      className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-violet-500 hover:bg-violet-50 transition-colors cursor-pointer disabled:opacity-40"
                       title="View document"
                     >
                       <span className="material-symbols-outlined text-xl">visibility</span>
-                    </a>
+                    </button>
                   )}
 
-                  {/* Download button */}
-                  <a
-                    href={api.getDocumentDownloadUrl(doc.doc_id)}
-                    download
-                    onClick={(e) => e.stopPropagation()}
-                    className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
+                  <button
+                    type="button"
+                    disabled={busyDocId === doc.doc_id}
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      setBusyDocId(doc.doc_id);
+                      try {
+                        await api.downloadDocument(doc.doc_id, doc.file_name);
+                      } catch (err) {
+                        console.error(err);
+                        alert(err instanceof Error ? err.message : 'Download failed');
+                      } finally {
+                        setBusyDocId(null);
+                      }
+                    }}
+                    className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-violet-500 hover:bg-violet-50 transition-colors cursor-pointer disabled:opacity-40"
                     title="Download document"
                   >
                     <span className="material-symbols-outlined text-xl">download</span>
-                  </a>
+                  </button>
 
-                  {/* Delete button */}
                   {onDelete && (
                     <button
                       onClick={(e) => handleDeleteClick(e, doc)}
-                      className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container transition-colors cursor-pointer"
+                      className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
                       title="Delete document"
                     >
                       <span className="material-symbols-outlined text-xl">delete</span>
@@ -444,11 +410,10 @@ export function DocumentList({
                 </div>
               )}
 
-              {/* Delete button for non-indexed docs */}
               {onDelete && doc.status !== 'uploaded' && doc.status !== 'indexed' && (
                 <button
                   onClick={(e) => handleDeleteClick(e, doc)}
-                  className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                  className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                   title="Delete document"
                 >
                   <span className="material-symbols-outlined text-xl">delete</span>
@@ -456,18 +421,17 @@ export function DocumentList({
               )}
             </div>
 
-            {/* Processing progress bar */}
             {isProcessing && (
-              <div className="mt-3 h-1 bg-surface-container-high rounded-full overflow-hidden">
+              <div className="mt-3 h-1 bg-neutral-100 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     doc.status === 'uploaded'
                       ? 'w-1/4 bg-amber-400'
                       : doc.status === 'extracting'
-                      ? 'w-2/4 bg-indigo-500'
+                      ? 'w-2/4 bg-violet-500'
                       : doc.status === 'chunking'
-                      ? 'w-3/4 bg-indigo-600'
-                      : 'w-[90%] bg-purple-500'
+                      ? 'w-3/4 bg-violet-600'
+                      : 'w-[90%] bg-cyan-500'
                   }`}
                 />
               </div>
@@ -476,7 +440,6 @@ export function DocumentList({
         );
       })}
 
-      {/* Delete Confirmation Modal */}
       {deleteTarget && (
         <DeleteConfirmModal
           fileName={deleteTarget.file_name}

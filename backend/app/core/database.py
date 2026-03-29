@@ -19,6 +19,9 @@ async def init_db():
     await _database.document_pages.create_index("document_id")
     await _database.chunks.create_index("document_id")
 
+    await _database.users.create_index("clerk_user_id", unique=True)
+    await _database.documents.create_index("user_id")
+
     print("[DATABASE] MongoDB connected and indexes created")
 
 

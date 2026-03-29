@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     debug: bool = False
 
     # CORS - comma-separated list of allowed origins
-    cors_origins: str = "http://localhost:5173,http://localhost:3000"
+    cors_origins: str = "http://localhost:5173,http://localhost:3000,https://doc-rag-opal.vercel.app"
 
     # OpenAI
     openai_api_key: str
@@ -32,6 +32,15 @@ class Settings(BaseSettings):
 
     # MongoDB
     mongodb_url: str = "mongodb://localhost:27017"
+
+    # Clerk (session JWT verification + optional Backend API / webhooks)
+    # Dashboard → JWT verification: Issuer + JWKS URL
+    clerk_jwks_url: str = ""
+    clerk_issuer: str = ""
+    # Secret key (sk_...) — fetch full user profile on first API request; optional if you only sync via webhooks
+    clerk_secret_key: str = ""
+    # Webhook signing secret (whsec_...) from Clerk → Webhooks
+    clerk_webhook_secret: str = ""
 
     # Chunking
     chunk_size_tokens: int = 600

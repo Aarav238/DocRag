@@ -8,6 +8,7 @@ import os
 import uuid
 from datetime import datetime
 
+from app.core.auth import UserContext, get_current_user
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.models.document import DocumentStatus
@@ -37,6 +38,7 @@ MIME_TYPES = {
 @router.post("/upload")
 async def upload_document(
     background_tasks: BackgroundTasks,
+    user: UserContext = Depends(get_current_user),
     file: UploadFile = File(...),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
@@ -77,6 +79,7 @@ async def upload_document(
     doc_id = str(uuid.uuid4())
     doc = {
         "_id": doc_id,
+        "user_id": user.id,
         "file_name": file.filename,
         "file_path": file_path,
         "file_url": file_url,
@@ -103,6 +106,7 @@ async def upload_document(
 async def register_document(
     request: RegisterDocumentRequest,
     background_tasks: BackgroundTasks,
+    user: UserContext = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
     """Register a document that was uploaded to UploadThing."""
@@ -123,6 +127,7 @@ async def register_document(
     doc_id = str(uuid.uuid4())
     doc = {
         "_id": doc_id,
+        "user_id": user.id,
         "file_name": request.file_name,
         "file_path": None,
         "file_url": request.file_url,
@@ -145,33 +150,14 @@ async def register_document(
     }
 
 
-@router.get("/{doc_id}")
-async def get_document(doc_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
-    """Get document details and status."""
-    doc = await db.documents.find_one({"_id": doc_id})
-
-    if not doc:
-        raise HTTPException(status_code=404, detail="Document not found")
-
-    return {
-        "doc_id": doc["_id"],
-        "file_name": doc["file_name"],
-        "file_type": doc["file_type"],
-        "file_size": doc["file_size"],
-        "status": doc["status"],
-        "error_message": doc.get("error_message"),
-        "created_at": doc["created_at"].isoformat(),
-        "updated_at": doc["updated_at"].isoformat(),
-    }
-
-
 @router.get("")
 async def list_documents(
     status: Optional[str] = None,
+    user: UserContext = Depends(get_current_user),
     db: AsyncIOMotorDatabase = Depends(get_db),
 ):
-    """List all documents."""
-    query = {}
+    """List documents for the authenticated user."""
+    query: dict = {"user_id": user.id}
 
     if status:
         try:
@@ -197,13 +183,41 @@ async def list_documents(
     }
 
 
+@router.get("/{doc_id}")
+async def get_document(
+    doc_id: str,
+    user: UserContext = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
+    """Get document details and status."""
+    doc = await db.documents.find_one({"_id": doc_id, "user_id": user.id})
+
+    if not doc:
+        raise HTTPException(status_code=404, detail="Document not found")
+
+    return {
+        "doc_id": doc["_id"],
+        "file_name": doc["file_name"],
+        "file_type": doc["file_type"],
+        "file_size": doc["file_size"],
+        "status": doc["status"],
+        "error_message": doc.get("error_message"),
+        "created_at": doc["created_at"].isoformat(),
+        "updated_at": doc["updated_at"].isoformat(),
+    }
+
+
 @router.delete("/{doc_id}")
-async def delete_document(doc_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def delete_document(
+    doc_id: str,
+    user: UserContext = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
     """Delete a document and its associated data."""
     from app.main import app
     from app.services.vector_store import VectorStore
 
-    doc = await db.documents.find_one({"_id": doc_id})
+    doc = await db.documents.find_one({"_id": doc_id, "user_id": user.id})
 
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -242,9 +256,13 @@ async def delete_document(doc_id: str, db: AsyncIOMotorDatabase = Depends(get_db
 
 
 @router.get("/{doc_id}/download")
-async def download_document(doc_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def download_document(
+    doc_id: str,
+    user: UserContext = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
     """Download the original document file."""
-    doc = await db.documents.find_one({"_id": doc_id})
+    doc = await db.documents.find_one({"_id": doc_id, "user_id": user.id})
 
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")
@@ -265,9 +283,13 @@ async def download_document(doc_id: str, db: AsyncIOMotorDatabase = Depends(get_
 
 
 @router.get("/{doc_id}/view")
-async def view_document(doc_id: str, db: AsyncIOMotorDatabase = Depends(get_db)):
+async def view_document(
+    doc_id: str,
+    user: UserContext = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db),
+):
     """Get document for inline viewing (PDF only)."""
-    doc = await db.documents.find_one({"_id": doc_id})
+    doc = await db.documents.find_one({"_id": doc_id, "user_id": user.id})
 
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found")

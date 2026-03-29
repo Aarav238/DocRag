@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Query, Depends, Request, HTTPException
 from typing import Optional, List
 from pydantic import BaseModel
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.core.auth import UserContext, get_current_user
 from app.core.config import get_settings
+from app.core.database import get_db
 from app.services.embedding import get_embedding
 from app.services.vector_store import VectorStore
+from app.services.user_documents import intersect_doc_filter
 
 router = APIRouter()
 settings = get_settings()
@@ -29,36 +33,38 @@ class SearchResponse(BaseModel):
 @router.get("", response_model=SearchResponse)
 async def semantic_search(
     request: Request,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    user: UserContext = Depends(get_current_user),
     q: str = Query(..., min_length=1, description="Search query"),
     doc_ids: Optional[str] = Query(None, description="Comma-separated document IDs to filter"),
     top_k: int = Query(5, ge=1, le=20, description="Number of results to return"),
 ):
-    """Perform semantic search across indexed documents."""
+    """Perform semantic search across indexed documents owned by the user."""
     vector_store: VectorStore = request.app.state.vector_store
 
     if not vector_store.is_initialized:
         raise HTTPException(status_code=503, detail="Vector store not initialized")
 
-    # Parse doc_ids filter
-    doc_id_list = None
+    doc_id_list: Optional[List[str]] = None
     if doc_ids:
         doc_id_list = [d.strip() for d in doc_ids.split(",") if d.strip()]
 
-    # Get query embedding
+    filtered = await intersect_doc_filter(db, user.id, doc_id_list, indexed_only=True)
+    if not filtered:
+        return SearchResponse(query=q, results=[], total_results=0)
+
     query_embedding = await get_embedding(q)
 
-    # Search vector store
     results = await vector_store.search(
         query_embedding=query_embedding,
         top_k=top_k,
-        doc_ids=doc_id_list,
+        doc_ids=filtered,
     )
 
-    # Deduplicate and rank results
     seen_texts = set()
     unique_results = []
     for r in results:
-        text_hash = hash(r["text"][:200])  # Use first 200 chars for dedup
+        text_hash = hash(r["text"][:200])
         if text_hash not in seen_texts:
             seen_texts.add(text_hash)
             unique_results.append(

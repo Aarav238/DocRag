@@ -10,7 +10,7 @@ from app.core.database import init_db, close_db
 from app.core.logging import setup_logging, metrics
 from app.core.exceptions import AppException, to_http_exception
 from app.core.cache import embedding_cache, search_cache
-from app.api import documents, search, qa, draft
+from app.api import documents, search, qa, draft, users, webhooks
 
 settings = get_settings()
 setup_logging(settings.debug)
@@ -79,6 +79,8 @@ app.include_router(documents.router, prefix="/documents", tags=["Documents"])
 app.include_router(search.router, prefix="/search", tags=["Search"])
 app.include_router(qa.router, prefix="/qa", tags=["Q&A"])
 app.include_router(draft.router, prefix="/draft", tags=["Draft Generator"])
+app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(webhooks.router, prefix="/webhooks", tags=["Webhooks"])
 
 
 @app.get("/health")

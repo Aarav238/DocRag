@@ -1,11 +1,15 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 from typing import Optional, List
 from pydantic import BaseModel
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
+from app.core.auth import UserContext, get_current_user
 from app.core.config import get_settings
+from app.core.database import get_db
 from app.services.embedding import get_embedding
 from app.services.vector_store import VectorStore
 from app.services.llm import generate_answer
+from app.services.user_documents import intersect_doc_filter
 
 router = APIRouter()
 settings = get_settings()
@@ -37,21 +41,30 @@ class QAResponse(BaseModel):
 async def answer_question(
     request: Request,
     qa_request: QARequest,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    user: UserContext = Depends(get_current_user),
 ):
-    """Answer a question based on indexed documents."""
+    """Answer a question based on indexed documents owned by the user."""
     vector_store: VectorStore = request.app.state.vector_store
 
     if not vector_store.is_initialized:
         raise HTTPException(status_code=503, detail="Vector store not initialized")
 
-    # Get question embedding
+    filtered = await intersect_doc_filter(db, user.id, qa_request.doc_ids, indexed_only=True)
+    if not filtered:
+        return QAResponse(
+            question=qa_request.question,
+            answer="No indexed documents are available for your account. Upload and index documents first.",
+            sources=[],
+            confidence="low",
+        )
+
     question_embedding = await get_embedding(qa_request.question)
 
-    # Retrieve relevant chunks
     results = await vector_store.search(
         query_embedding=question_embedding,
         top_k=qa_request.top_k,
-        doc_ids=qa_request.doc_ids,
+        doc_ids=filtered,
     )
 
     if not results:
@@ -62,7 +75,6 @@ async def answer_question(
             confidence="low",
         )
 
-    # Build context from retrieved chunks
     context_parts = []
     sources = []
     for i, r in enumerate(results):
@@ -90,7 +102,6 @@ async def answer_question(
 
     context = "\n\n".join(context_parts)
 
-    # Generate answer using LLM
     answer, confidence = await generate_answer(
         question=qa_request.question,
         context=context,

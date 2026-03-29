@@ -25,3 +25,8 @@ pydantic-settings>=2.1.0
 aiofiles>=23.2.1
 httpx>=0.26.0
 tenacity>=8.2.3
+
+# Auth (Clerk JWT + webhooks)
+PyJWT[crypto]>=2.8.0
+certifi>=2024.2.2
+svix>=1.0.0

@@ -30,18 +30,17 @@ export function UploadPage() {
   }, []);
 
   const startPolling = useCallback(() => {
-    if (intervalRef.current) return; // Already polling
+    if (intervalRef.current) return;
 
     intervalRef.current = window.setInterval(async () => {
       const docs = await fetchDocuments();
-      // Stop polling if no documents are being processed
       if (!hasProcessingDocuments(docs)) {
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
         }
       }
-    }, 2000); // Poll every 2 seconds for better UX
+    }, 2000);
   }, [fetchDocuments, hasProcessingDocuments]);
 
   const stopPolling = useCallback(() => {
@@ -52,7 +51,6 @@ export function UploadPage() {
   }, []);
 
   useEffect(() => {
-    // Initial fetch
     fetchDocuments().then((docs) => {
       if (hasProcessingDocuments(docs)) {
         startPolling();
@@ -71,7 +69,6 @@ export function UploadPage() {
     try {
       await api.uploadDocument(file);
       await fetchDocuments();
-      // Start polling since we just uploaded a new document
       startPolling();
       setSuccessMessage(`"${file.name}" uploaded successfully! Processing started.`);
       setTimeout(() => setSuccessMessage(null), 5000);
@@ -92,55 +89,28 @@ export function UploadPage() {
     }
   };
 
-  const indexedCount = documents.filter((d) => d.status === 'indexed').length;
-  const processingCount = documents.filter((d) => PROCESSING_STATUSES.includes(d.status)).length;
-
   return (
-    <div className="flex flex-col min-h-full">
-      {/* Header */}
-      <header className="bg-white/70 backdrop-blur-xl sticky top-0 z-50 w-full flex justify-between items-center px-8 py-4 border-b border-slate-100">
-        <div className="flex items-center gap-6">
-          <h2 className="font-headline text-xl font-extrabold tracking-tight text-indigo-900">
-            Upload Documents
-          </h2>
-          <div className="flex items-center gap-3">
-            {indexedCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-medium">
-                <span className="w-2 h-2 bg-green-500 rounded-full" />
-                {indexedCount} indexed
-              </span>
-            )}
-            {processingCount > 0 && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm font-medium">
-                <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
-                {processingCount} processing
-              </span>
-            )}
-          </div>
-        </div>
-      </header>
-
-      {/* Content */}
-      <div className="max-w-6xl mx-auto p-8 w-full space-y-8">
+    <div className="flex flex-col min-h-full animate-fade-in">
+      <div className="mx-auto w-full max-w-6xl space-y-8 p-8">
         {/* Success Message */}
         {successMessage && (
-          <div className="border-l-4 border-green-500 bg-green-50 px-4 py-3 rounded-r-lg flex items-center gap-3">
-            <span className="material-symbols-outlined text-green-600 flex-shrink-0">check_circle</span>
-            <span className="text-green-800 font-medium">{successMessage}</span>
+          <div className="border border-emerald-200 bg-emerald-50 px-5 py-4 rounded-xl flex items-center gap-3 animate-scale-in">
+            <span className="material-symbols-outlined text-emerald-600 flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+            <span className="text-emerald-800 font-medium">{successMessage}</span>
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="border-l-4 border-red-500 bg-red-50 px-4 py-3 rounded-r-lg flex items-start gap-3">
-            <span className="material-symbols-outlined text-red-600 flex-shrink-0 mt-0.5">error</span>
+          <div className="border border-red-200 bg-red-50 px-5 py-4 rounded-xl flex items-start gap-3 animate-scale-in">
+            <span className="material-symbols-outlined text-red-500 flex-shrink-0 mt-0.5">error</span>
             <div>
-              <p className="font-medium text-red-800">Upload failed</p>
+              <p className="font-bold text-red-800">Upload failed</p>
               <p className="text-sm text-red-700 mt-1">{error}</p>
             </div>
             <button
               onClick={() => setError(null)}
-              className="ml-auto text-red-500 hover:text-red-700 cursor-pointer"
+              className="ml-auto text-red-400 hover:text-red-600 cursor-pointer"
             >
               <span className="material-symbols-outlined text-xl">close</span>
             </button>
@@ -156,10 +126,10 @@ export function UploadPage() {
 
         {/* Documents List */}
         <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-headline text-lg font-bold text-on-surface">Your Documents</h2>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-headline text-lg font-bold text-neutral-900">Your Documents</h2>
             {documents.length > 0 && (
-              <span className="text-sm text-outline">{documents.length} total</span>
+              <span className="text-sm font-medium text-neutral-400">{documents.length} total</span>
             )}
           </div>
           <DocumentList documents={documents} onDelete={handleDelete} />
