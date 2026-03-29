@@ -27,42 +27,40 @@ function DeleteConfirmModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-indigo-950/40 backdrop-blur-sm"
         onClick={!isDeleting ? onCancel : undefined}
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+      <div className="relative bg-surface-container-lowest rounded-2xl shadow-2xl max-w-md w-full mx-4 overflow-hidden p-8">
         {/* Header */}
-        <div className="p-6 pb-4">
-          <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+        <div className="pb-4">
+          <div className="w-14 h-14 rounded-full bg-error-container flex items-center justify-center mx-auto mb-4">
+            <span className="material-symbols-outlined text-error text-3xl">warning</span>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 text-center">Delete Document</h3>
-          <p className="text-sm text-gray-500 text-center mt-2">
+          <h3 className="font-headline text-2xl font-bold text-on-surface text-center">Delete Document</h3>
+          <p className="text-sm text-on-surface-variant text-center mt-2">
             Are you sure you want to delete{' '}
-            <span className="font-medium text-gray-700">"{fileName}"</span>?
+            <span className="font-medium text-on-surface">"{fileName}"</span>?
           </p>
-          <p className="text-xs text-gray-400 text-center mt-2">
+          <p className="text-xs text-on-surface-variant/70 text-center mt-2">
             This will permanently remove the document and all its indexed data.
           </p>
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3 p-4 bg-gray-50 border-t border-gray-100">
+        <div className="flex gap-3 pt-4">
           <button
             onClick={onCancel}
             disabled={isDeleting}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex-1 px-4 py-2.5 text-sm font-bold text-on-surface-variant bg-surface-container-high rounded-lg hover:bg-surface-container-highest transition-colors disabled:opacity-50 cursor-pointer"
           >
             Cancel
           </button>
           <button
             onClick={onConfirm}
             disabled={isDeleting}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            className="flex-1 px-4 py-2.5 text-sm font-bold text-white bg-error rounded-lg shadow-lg shadow-error/20 hover:bg-error/90 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
           >
             {isDeleting ? (
               <>
@@ -85,37 +83,37 @@ function DeleteConfirmModal({
 const statusConfig: Record<string, { color: string; bgColor: string; label: string; icon: string }> = {
   uploaded: {
     color: 'text-amber-700',
-    bgColor: 'bg-amber-50 border-amber-200',
+    bgColor: 'bg-amber-50',
     label: 'Queued',
     icon: 'clock',
   },
   extracting: {
-    color: 'text-blue-700',
-    bgColor: 'bg-blue-50 border-blue-200',
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
     label: 'Extracting text...',
     icon: 'document',
   },
   chunking: {
     color: 'text-indigo-700',
-    bgColor: 'bg-indigo-50 border-indigo-200',
+    bgColor: 'bg-indigo-50',
     label: 'Chunking...',
     icon: 'scissors',
   },
   embedding: {
     color: 'text-purple-700',
-    bgColor: 'bg-purple-50 border-purple-200',
+    bgColor: 'bg-purple-50',
     label: 'Creating embeddings...',
     icon: 'sparkles',
   },
   indexed: {
     color: 'text-green-700',
-    bgColor: 'bg-green-50 border-green-200',
+    bgColor: 'bg-green-50',
     label: 'Ready',
     icon: 'check',
   },
   failed: {
-    color: 'text-red-700',
-    bgColor: 'bg-red-50 border-red-200',
+    color: 'text-error',
+    bgColor: 'bg-error-container',
     label: 'Failed',
     icon: 'x',
   },
@@ -173,18 +171,14 @@ function FileIcon({ fileType }: { fileType: string }) {
   const isPdf = fileType.includes('pdf');
   if (isPdf) {
     return (
-      <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center">
-        <svg className="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-        </svg>
+      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+        <span className="material-symbols-outlined text-primary text-2xl">description</span>
       </div>
     );
   }
   return (
-    <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
-      <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-        <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-      </svg>
+    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+      <span className="material-symbols-outlined text-primary text-2xl">article</span>
     </div>
   );
 }
@@ -236,13 +230,11 @@ export function DocumentList({
   if (documents.length === 0) {
     return (
       <div className="text-center py-16">
-        <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-          <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+        <div className="w-16 h-16 rounded-full bg-surface-container-high flex items-center justify-center mx-auto mb-4">
+          <span className="material-symbols-outlined text-on-surface-variant text-3xl">description</span>
         </div>
-        <p className="text-gray-500 font-medium">No documents uploaded yet</p>
-        <p className="text-sm text-gray-400 mt-1">Upload a PDF or DOCX to get started</p>
+        <p className="text-on-surface-variant font-medium">No documents uploaded yet</p>
+        <p className="text-sm text-on-surface-variant/70 mt-1">Upload a PDF or DOCX to get started</p>
       </div>
     );
   }
@@ -259,12 +251,12 @@ export function DocumentList({
           return (
             <div
               key={doc.doc_id}
-              className={`group relative rounded-lg border p-3 transition-all duration-200 ${
+              className={`group relative rounded-xl border p-3 transition-all duration-200 ${
                 canSelect ? 'cursor-pointer' : ''
               } ${
                 isSelected
-                  ? 'border-blue-500 bg-blue-50 shadow-sm'
-                  : 'border-gray-200 bg-white hover:border-blue-300 hover:bg-gray-50'
+                  ? 'border-primary bg-primary-fixed/20 shadow-sm'
+                  : 'border-outline-variant/10 bg-surface-container-lowest hover:border-primary/30 hover:bg-surface-container-low'
               }`}
               onClick={() => canSelect && toggleSelection(doc.doc_id)}
             >
@@ -274,8 +266,8 @@ export function DocumentList({
                   <div
                     className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                       isSelected
-                        ? 'bg-blue-600 border-blue-600'
-                        : 'border-gray-300 group-hover:border-blue-400'
+                        ? 'bg-primary border-primary'
+                        : 'border-primary/40 group-hover:border-primary'
                     }`}
                   >
                     {isSelected && (
@@ -287,20 +279,18 @@ export function DocumentList({
                 )}
 
                 {/* Small file icon */}
-                <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                  isPdf ? 'bg-red-100' : 'bg-blue-100'
-                }`}>
-                  <svg className={`w-4 h-4 ${isPdf ? 'text-red-600' : 'text-blue-600'}`} fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-                  </svg>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 bg-primary/10">
+                  <span className="material-symbols-outlined text-primary text-lg">
+                    {isPdf ? 'description' : 'article'}
+                  </span>
                 </div>
 
                 {/* File info */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate" title={doc.file_name}>
+                  <p className="text-sm font-medium text-on-surface truncate" title={doc.file_name}>
                     {doc.file_name}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-on-surface-variant">
                     {getFileExtension(doc.file_type, doc.file_name).toUpperCase()} · {new Date(doc.created_at).toLocaleString('en-IN', {
                       month: 'short',
                       day: 'numeric',
@@ -309,9 +299,23 @@ export function DocumentList({
                   </p>
                 </div>
 
+                {/* View button */}
+                {doc.status === 'indexed' && (
+                  <a
+                    href={api.getDocumentViewUrl(doc.doc_id)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-on-surface-variant/50 hover:text-primary hover:bg-primary/10 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                    title="View document"
+                  >
+                    <span className="material-symbols-outlined text-[18px] leading-none">visibility</span>
+                  </a>
+                )}
+
                 {/* Selection indicator */}
                 {isSelected && (
-                  <div className="w-2 h-2 rounded-full bg-blue-600 flex-shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                 )}
               </div>
             </div>
@@ -333,18 +337,18 @@ export function DocumentList({
         return (
           <div
             key={doc.doc_id}
-            className={`group relative bg-white rounded-xl border-2 p-4 transition-all duration-200 ${
+            className={`group relative bg-surface-container-lowest rounded-2xl border p-4 transition-all duration-200 ${
               canSelect ? 'cursor-pointer' : ''
             } ${
               isSelected
-                ? 'border-blue-500 bg-blue-50/50 shadow-md shadow-blue-500/10'
-                : 'border-gray-100 hover:border-gray-200 hover:shadow-sm'
+                ? 'border-primary bg-primary-fixed/10 shadow-md shadow-primary/10'
+                : 'border-outline-variant/10 hover:border-outline-variant/20 shadow-sm hover:shadow-md'
             } ${isProcessing ? 'animate-pulse' : ''}`}
             onClick={() => canSelect && toggleSelection(doc.doc_id)}
           >
             {/* Processing overlay shimmer */}
             {isProcessing && (
-              <div className="absolute inset-0 rounded-xl overflow-hidden">
+              <div className="absolute inset-0 rounded-2xl overflow-hidden">
                 <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
               </div>
             )}
@@ -356,8 +360,8 @@ export function DocumentList({
                   <div
                     className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors cursor-pointer ${
                       isSelected
-                        ? 'bg-blue-600 border-blue-600'
-                        : 'border-gray-300 group-hover:border-blue-400'
+                        ? 'bg-primary border-primary'
+                        : 'border-outline-variant group-hover:border-primary'
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -378,10 +382,10 @@ export function DocumentList({
 
               {/* File info */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate" title={doc.file_name}>
+                <p className="font-semibold text-on-surface truncate" title={doc.file_name}>
                   {doc.file_name}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-on-surface-variant mt-1">
                   {getFileExtension(doc.file_type, doc.file_name).toUpperCase()} · {new Date(doc.created_at).toLocaleString('en-IN', {
                     month: 'short',
                     day: 'numeric',
@@ -394,7 +398,7 @@ export function DocumentList({
               </div>
 
               {/* Status badge */}
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full border ${config.bgColor} ${config.color}`}>
+              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${config.bgColor} ${config.color}`}>
                 <StatusIcon status={doc.status} />
                 <span className="text-sm font-medium whitespace-nowrap">{config.label}</span>
               </div>
@@ -409,13 +413,10 @@ export function DocumentList({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer"
+                      className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                       title="View document"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
+                      <span className="material-symbols-outlined text-xl">visibility</span>
                     </a>
                   )}
 
@@ -424,24 +425,20 @@ export function DocumentList({
                     href={api.getDocumentDownloadUrl(doc.doc_id)}
                     download
                     onClick={(e) => e.stopPropagation()}
-                    className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors cursor-pointer"
+                    className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-colors cursor-pointer"
                     title="Download document"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                    </svg>
+                    <span className="material-symbols-outlined text-xl">download</span>
                   </a>
 
                   {/* Delete button */}
                   {onDelete && (
                     <button
                       onClick={(e) => handleDeleteClick(e, doc)}
-                      className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                      className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container transition-colors cursor-pointer"
                       title="Delete document"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
+                      <span className="material-symbols-outlined text-xl">delete</span>
                     </button>
                   )}
                 </div>
@@ -451,27 +448,25 @@ export function DocumentList({
               {onDelete && doc.status !== 'uploaded' && doc.status !== 'indexed' && (
                 <button
                   onClick={(e) => handleDeleteClick(e, doc)}
-                  className="flex-shrink-0 p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
+                  className="flex-shrink-0 p-2 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
                   title="Delete document"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <span className="material-symbols-outlined text-xl">delete</span>
                 </button>
               )}
             </div>
 
             {/* Processing progress bar */}
             {isProcessing && (
-              <div className="mt-3 h-1 bg-gray-100 rounded-full overflow-hidden">
+              <div className="mt-3 h-1 bg-surface-container-high rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all duration-500 ${
                     doc.status === 'uploaded'
                       ? 'w-1/4 bg-amber-400'
                       : doc.status === 'extracting'
-                      ? 'w-2/4 bg-blue-500'
+                      ? 'w-2/4 bg-indigo-500'
                       : doc.status === 'chunking'
-                      ? 'w-3/4 bg-indigo-500'
+                      ? 'w-3/4 bg-indigo-600'
                       : 'w-[90%] bg-purple-500'
                   }`}
                 />

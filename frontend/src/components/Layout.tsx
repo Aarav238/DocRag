@@ -6,52 +6,74 @@ interface LayoutProps {
 }
 
 const navItems = [
-  { path: '/upload', label: 'Upload', icon: '📤' },
-  { path: '/search', label: 'Search', icon: '🔍' },
-  { path: '/chat', label: 'Chat', icon: '💬' },
-  { path: '/draft', label: 'Draft', icon: '📝' },
-  { path: '/guide', label: 'Guide', icon: '📖' },
+  { path: '/upload', label: 'Upload', icon: 'upload_file' },
+  { path: '/search', label: 'Search', icon: 'search' },
+  { path: '/chat', label: 'Chat', icon: 'chat_bubble' },
+  { path: '/draft', label: 'Draft', icon: 'edit_note' },
+  { path: '/guide', label: 'Guide', icon: 'auto_stories' },
 ];
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <Link
-                to="/"
-                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-              >
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">D</span>
-                </div>
-                <span className="text-xl font-bold text-gray-900">DocRAG</span>
-              </Link>
+    <div className="min-h-screen bg-background text-on-surface flex">
+      {/* Sidebar Navigation */}
+      <aside className="h-screen w-64 fixed left-0 top-0 z-40 bg-slate-50 flex flex-col py-6 space-y-2 border-r border-slate-100">
+        <div className="px-6 mb-8">
+          <Link to="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 primary-gradient rounded-lg flex items-center justify-center text-white shadow-lg">
+              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
             </div>
-            <div className="flex items-center space-x-1">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
-                    location.pathname === item.path
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100'
-                  }`}
-                >
-                  <span className="mr-2">{item.icon}</span>
-                  {item.label}
-                </Link>
-              ))}
+            <div>
+              <h1 className="text-lg font-black text-indigo-950 leading-tight font-headline">DocRAG</h1>
+              <p className="text-[10px] uppercase tracking-widest text-secondary font-bold">The Intelligent Layer</p>
             </div>
-          </div>
+          </Link>
         </div>
-      </nav>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <nav className="flex-1 px-4 space-y-1">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.path ||
+              (item.path === '/draft' && location.pathname.startsWith('/draft'));
+            return (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`mx-2 flex items-center px-4 py-3 rounded-lg transition-all duration-200 ease-in-out group ${
+                  isActive
+                    ? 'bg-white text-indigo-700 shadow-sm'
+                    : 'text-slate-600 hover:text-indigo-500 hover:bg-indigo-50/50'
+                }`}
+              >
+                <span
+                  className="material-symbols-outlined mr-3"
+                  style={isActive ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                >
+                  {item.icon}
+                </span>
+                <span className={`text-sm ${isActive ? 'font-semibold' : 'font-medium'}`}>
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="px-6 py-4">
+          <Link
+            to="/upload"
+            className="w-full py-3 px-4 rounded-xl primary-gradient text-white text-sm font-bold shadow-lg hover:opacity-90 transition-all flex items-center justify-center gap-2"
+          >
+            <span className="material-symbols-outlined text-sm">add</span>
+            New Analysis
+          </Link>
+        </div>
+
+      </aside>
+
+      {/* Main Content */}
+      <main className="ml-64 flex-1 min-h-screen">
         {children}
       </main>
     </div>

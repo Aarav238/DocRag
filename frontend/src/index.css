@@ -1,18 +1,115 @@
 @import "tailwindcss";
 
+@theme {
+  /* Primary */
+  --color-primary: #2b3896;
+  --color-primary-container: #4551af;
+  --color-primary-fixed: #dfe0ff;
+  --color-primary-fixed-dim: #bcc2ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #cbcfff;
+  --color-on-primary-fixed: #000c62;
+  --color-on-primary-fixed-variant: #303c9a;
+
+  /* Secondary */
+  --color-secondary: #006876;
+  --color-secondary-container: #58e6ff;
+  --color-secondary-fixed: #a1efff;
+  --color-secondary-fixed-dim: #44d8f1;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #006573;
+  --color-on-secondary-fixed: #001f25;
+  --color-on-secondary-fixed-variant: #004e59;
+
+  /* Tertiary */
+  --color-tertiary: #004a54;
+  --color-tertiary-container: #006470;
+  --color-tertiary-fixed: #9cf0ff;
+  --color-tertiary-fixed-dim: #00daf3;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #31e6ff;
+  --color-on-tertiary-fixed: #001f24;
+  --color-on-tertiary-fixed-variant: #004f58;
+
+  /* Surface */
+  --color-surface: #f8f9fa;
+  --color-surface-bright: #f8f9fa;
+  --color-surface-dim: #d9dadb;
+  --color-surface-container: #edeeef;
+  --color-surface-container-low: #f3f4f5;
+  --color-surface-container-high: #e7e8e9;
+  --color-surface-container-highest: #e1e3e4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-variant: #e1e3e4;
+  --color-surface-tint: #4955b3;
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #454652;
+  --color-background: #f8f9fa;
+  --color-on-background: #191c1d;
+
+  /* Outline */
+  --color-outline: #757684;
+  --color-outline-variant: #c5c5d4;
+
+  /* Error */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  /* Inverse */
+  --color-inverse-surface: #2e3132;
+  --color-inverse-on-surface: #f0f1f2;
+  --color-inverse-primary: #bcc2ff;
+
+  /* Fonts */
+  --font-headline: 'Manrope', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-label: 'Inter', sans-serif;
+}
+
 body {
-  @apply bg-gray-50 text-gray-900 min-h-screen;
+  font-family: 'Inter', sans-serif;
+  background-color: #f8f9fa;
+  color: #191c1d;
+}
+
+.font-headline {
+  font-family: 'Manrope', sans-serif;
+}
+
+/* Material Symbols */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Glass panel effect */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Primary gradient */
+.primary-gradient {
+  background: linear-gradient(135deg, #2b3896 0%, #4551af 100%);
+}
+
+/* AI shimmer animation */
+@keyframes ai-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.ai-pulse {
+  background: linear-gradient(90deg, #006876 0%, #9cf0ff 50%, #006876 100%);
+  background-size: 200% 100%;
+  animation: ai-shimmer 2s infinite linear;
 }
 
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
-}
-
-/* Custom gradient text support for older browsers */
-.bg-clip-text {
-  -webkit-background-clip: text;
-  background-clip: text;
 }
 
 /* Custom scrollbar styling */
@@ -36,12 +133,13 @@ html {
 
 /* Focus visible outline for accessibility */
 :focus-visible {
-  @apply outline-2 outline-blue-500 outline-offset-2;
+  @apply outline-2 outline-primary outline-offset-2;
 }
 
 /* Selection styling */
 ::selection {
-  @apply bg-blue-100 text-blue-900;
+  background-color: #dfe0ff;
+  color: #000c62;
 }
 
 /* Shimmer animation for loading states */
@@ -60,51 +158,51 @@ html {
 
 /* Prose styles for markdown rendering */
 .prose h1 {
-  @apply text-2xl font-bold text-gray-900 mb-4 pb-2 border-b border-gray-200;
+  @apply text-2xl font-bold text-on-surface mb-4 pb-2 border-b border-outline-variant;
 }
 
 .prose h2 {
-  @apply text-xl font-semibold text-gray-900 mt-8 mb-4;
+  @apply text-xl font-semibold text-on-surface mt-8 mb-4;
 }
 
 .prose h3 {
-  @apply text-lg font-semibold text-gray-800 mt-6 mb-3;
+  @apply text-lg font-semibold text-on-surface mt-6 mb-3;
 }
 
 .prose p {
-  @apply text-gray-700 leading-relaxed mb-4;
+  @apply text-on-surface-variant leading-relaxed mb-4;
 }
 
 .prose ul {
-  @apply list-disc list-inside space-y-2 mb-4 text-gray-700;
+  @apply list-disc list-inside space-y-2 mb-4 text-on-surface-variant;
 }
 
 .prose ol {
-  @apply list-decimal list-inside space-y-2 mb-4 text-gray-700;
+  @apply list-decimal list-inside space-y-2 mb-4 text-on-surface-variant;
 }
 
 .prose li {
-  @apply text-gray-700;
+  @apply text-on-surface-variant;
 }
 
 .prose blockquote {
-  @apply border-l-4 border-blue-500 pl-4 italic text-gray-600 my-4;
+  @apply border-l-4 border-primary pl-4 italic text-on-surface-variant my-4;
 }
 
 .prose code {
-  @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm text-gray-800;
+  @apply bg-surface-container px-1.5 py-0.5 rounded text-sm text-on-surface;
 }
 
 .prose pre {
-  @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4;
+  @apply bg-inverse-surface text-inverse-on-surface p-4 rounded-lg overflow-x-auto my-4;
 }
 
 .prose a {
-  @apply text-blue-600 hover:underline;
+  @apply text-primary hover:underline;
 }
 
 .prose strong {
-  @apply font-semibold text-gray-900;
+  @apply font-semibold text-on-surface;
 }
 
 .prose em {

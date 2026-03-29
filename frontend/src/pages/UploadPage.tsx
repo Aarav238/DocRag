@@ -96,78 +96,74 @@ export function UploadPage() {
   const processingCount = documents.filter((d) => PROCESSING_STATUSES.includes(d.status)).length;
 
   return (
-    <div className="space-y-8">
+    <div className="flex flex-col min-h-full">
       {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Upload Documents</h1>
-          <p className="text-gray-600">
-            Upload PDF or DOCX files to index them for search and Q&A
-          </p>
-        </div>
-        {documents.length > 0 && (
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full">
-              <span className="w-2 h-2 bg-green-500 rounded-full" />
-              {indexedCount} indexed
-            </div>
+      <header className="bg-white/70 backdrop-blur-xl sticky top-0 z-50 w-full flex justify-between items-center px-8 py-4 border-b border-slate-100">
+        <div className="flex items-center gap-6">
+          <h2 className="font-headline text-xl font-extrabold tracking-tight text-indigo-900">
+            Upload Documents
+          </h2>
+          <div className="flex items-center gap-3">
+            {indexedCount > 0 && (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm font-medium">
+                <span className="w-2 h-2 bg-green-500 rounded-full" />
+                {indexedCount} indexed
+              </span>
+            )}
             {processingCount > 0 && (
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full">
-                <span className="w-2 h-2 bg-blue-500 rounded-full animate-pulse" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-full text-sm font-medium">
+                <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse" />
                 {processingCount} processing
-              </div>
+              </span>
             )}
           </div>
-        )}
-      </div>
-
-      {/* Success Message */}
-      {successMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl flex items-center gap-3">
-          <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-          <span>{successMessage}</span>
         </div>
-      )}
+      </header>
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-3">
-          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <div>
-            <p className="font-medium">Upload failed</p>
-            <p className="text-sm mt-1">{error}</p>
+      {/* Content */}
+      <div className="max-w-6xl mx-auto p-8 w-full space-y-8">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="border-l-4 border-green-500 bg-green-50 px-4 py-3 rounded-r-lg flex items-center gap-3">
+            <span className="material-symbols-outlined text-green-600 flex-shrink-0">check_circle</span>
+            <span className="text-green-800 font-medium">{successMessage}</span>
           </div>
-          <button
-            onClick={() => setError(null)}
-            className="ml-auto text-red-500 hover:text-red-700 cursor-pointer"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-      )}
+        )}
 
-      {/* File Upload */}
-      <FileUpload
-        onUpload={handleUpload}
-        isUploading={isUploading}
-        uploadingFileName={uploadingFileName}
-      />
+        {/* Error Message */}
+        {error && (
+          <div className="border-l-4 border-red-500 bg-red-50 px-4 py-3 rounded-r-lg flex items-start gap-3">
+            <span className="material-symbols-outlined text-red-600 flex-shrink-0 mt-0.5">error</span>
+            <div>
+              <p className="font-medium text-red-800">Upload failed</p>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto text-red-500 hover:text-red-700 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-xl">close</span>
+            </button>
+          </div>
+        )}
 
-      {/* Documents List */}
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Your Documents</h2>
-          {documents.length > 0 && (
-            <span className="text-sm text-gray-500">{documents.length} total</span>
-          )}
+        {/* File Upload */}
+        <FileUpload
+          onUpload={handleUpload}
+          isUploading={isUploading}
+          uploadingFileName={uploadingFileName}
+        />
+
+        {/* Documents List */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-headline text-lg font-bold text-on-surface">Your Documents</h2>
+            {documents.length > 0 && (
+              <span className="text-sm text-outline">{documents.length} total</span>
+            )}
+          </div>
+          <DocumentList documents={documents} onDelete={handleDelete} />
         </div>
-        <DocumentList documents={documents} onDelete={handleDelete} />
       </div>
     </div>
   );

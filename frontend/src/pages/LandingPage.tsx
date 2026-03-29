@@ -2,462 +2,546 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const features = [
   {
-    icon: '📤',
-    title: 'Smart Document Upload',
-    description: 'Upload PDF and DOCX files up to 50MB. Our AI automatically extracts, chunks, and indexes content for intelligent retrieval.',
+    icon: 'upload_file',
+    title: 'Upload',
+    description:
+      'Drag-and-drop PDFs and DOCX files up to 50 MB. Content is automatically parsed, chunked, and embedded for retrieval.',
     link: '/upload',
-    color: 'bg-blue-500',
+    iconBg: 'bg-indigo-50',
+    iconColor: 'text-indigo-600',
   },
   {
-    icon: '🔍',
-    title: 'Semantic Search',
-    description: 'Find information using natural language. Our AI understands context and meaning, delivering results even without exact keyword matches.',
+    icon: 'search',
+    title: 'Search',
+    description:
+      'Query your corpus with natural language. Semantic similarity finds relevant passages even without exact keyword matches.',
     link: '/search',
-    color: 'bg-purple-500',
+    iconBg: 'bg-cyan-50',
+    iconColor: 'text-cyan-600',
   },
   {
-    icon: '💬',
-    title: 'Document Q&A',
-    description: 'Ask questions and get accurate, cited answers. Every response is grounded in your documents with traceable sources.',
+    icon: 'chat',
+    title: 'Chat',
+    description:
+      'Ask questions and receive cited answers grounded entirely in your uploaded documents. No hallucinations.',
     link: '/chat',
-    color: 'bg-green-500',
+    iconBg: 'bg-emerald-50',
+    iconColor: 'text-emerald-600',
   },
   {
-    icon: '📝',
-    title: 'AI Document Generator',
-    description: 'Generate professional proposals, contracts, and reports from templates. Export to PDF, DOCX, or Markdown instantly.',
+    icon: 'edit_note',
+    title: 'Draft',
+    description:
+      'Generate polished proposals, contracts, and reports from templates. Export to PDF, DOCX, or Markdown instantly.',
     link: '/draft',
-    color: 'bg-orange-500',
+    iconBg: 'bg-violet-50',
+    iconColor: 'text-violet-600',
   },
-];
-
-const templates = [
-  { name: 'Business Proposal', icon: '💼' },
-  { name: 'Investment Pitch', icon: '📈' },
-  { name: 'Service Contract', icon: '📝' },
-  { name: 'Status Report', icon: '📊' },
-  { name: 'NDA', icon: '🔒' },
-  { name: 'Research Report', icon: '🔬' },
 ];
 
 const steps = [
   {
-    step: '01',
-    title: 'Upload Reference Documents',
-    description: 'Drag and drop your existing proposals, contracts, or reports. We analyze your writing style and content patterns.',
+    num: '01',
+    title: 'Upload & Ingest',
+    description:
+      'Drop your files into the pipeline. We extract text, detect structure, and split content into semantically coherent chunks.',
+    iconBg: 'bg-indigo-100',
+    numColor: 'text-indigo-700',
   },
   {
-    step: '02',
-    title: 'Choose a Template',
-    description: 'Select from professional templates or start custom. Our AI understands document structure and best practices.',
+    num: '02',
+    title: 'Vector Indexing',
+    description:
+      'Each chunk is embedded via a high-dimensional model and stored in a vector index for sub-millisecond nearest-neighbour search.',
+    iconBg: 'bg-cyan-100',
+    numColor: 'text-cyan-700',
   },
   {
-    step: '03',
-    title: 'Generate & Export',
-    description: 'Get a polished draft in seconds. Export to PDF, DOCX, or Markdown. Edit and iterate as needed.',
+    num: '03',
+    title: 'Synthesized Analysis',
+    description:
+      'Queries retrieve the most relevant chunks, which are fed as context to a large language model that synthesizes a grounded answer.',
+    iconBg: 'bg-emerald-100',
+    numColor: 'text-emerald-700',
   },
 ];
 
 const useCases = [
-  {
-    title: 'Sales Teams',
-    description: 'Generate personalized proposals in minutes, not hours. Win more deals faster.',
-    icon: '🎯',
-  },
-  {
-    title: 'Legal Teams',
-    description: 'Draft contracts and NDAs using your approved templates and language.',
-    icon: '⚖️',
-  },
-  {
-    title: 'Consultants',
-    description: 'Create professional deliverables based on your past successful projects.',
-    icon: '💼',
-  },
-  {
-    title: 'Startups',
-    description: 'Build investor decks and business plans using proven structures.',
-    icon: '🚀',
-  },
+  { icon: 'gavel', title: 'Legal Teams', desc: 'Review contracts and surface key clauses across thousands of pages.', iconBg: 'bg-amber-50', iconColor: 'text-amber-600' },
+  { icon: 'biotech', title: 'Researchers', desc: 'Synthesize findings from large paper corpora with full citations.', iconBg: 'bg-rose-50', iconColor: 'text-rose-600' },
+  { icon: 'engineering', title: 'Engineering', desc: 'Search technical manuals and specs using plain-language queries.', iconBg: 'bg-sky-50', iconColor: 'text-sky-600' },
+  { icon: 'trending_up', title: 'Consultants', desc: 'Generate client deliverables grounded in past successful projects.', iconBg: 'bg-violet-50', iconColor: 'text-violet-600' },
 ];
 
-const stats = [
-  { value: '10x', label: 'Faster Drafts' },
-  { value: '8+', label: 'Templates' },
-  { value: '100%', label: 'Source Citations' },
-  { value: '3', label: 'Export Formats' },
+const ragAdvantages = [
+  'Semantic retrieval understands meaning, not just keywords',
+  'Every answer carries traceable source citations',
+  'Documents remain private — never used for model training',
+  'Sub-millisecond vector search at any corpus size',
+  'Context-aware generation that matches your domain language',
 ];
 
 export function LandingPage() {
   const navigate = useNavigate();
 
   const handleTryDemo = () => {
-    // Navigate to draft page with demo mode enabled
     navigate('/draft?demo=true');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-sm font-bold">D</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">DocRAG</span>
+    <div className="min-h-screen bg-white text-on-surface">
+      {/* ───────── Navbar ───────── */}
+      <nav className="fixed top-0 inset-x-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 flex items-center justify-between h-16">
+          <Link to="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 primary-gradient rounded-lg flex items-center justify-center shadow-sm">
+              <span className="text-white text-sm font-bold">D</span>
             </div>
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-gray-600 hover:text-gray-900 cursor-pointer">Features</a>
-              <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 cursor-pointer">How it Works</a>
-              <a href="#templates" className="text-gray-600 hover:text-gray-900 cursor-pointer">Templates</a>
-              <Link to="/guide" className="text-gray-600 hover:text-gray-900 cursor-pointer">Guide</Link>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleTryDemo}
-                className="px-4 py-2 text-gray-700 font-medium hover:text-gray-900 cursor-pointer"
-              >
-                Try Demo
-              </button>
-              <Link
-                to="/upload"
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-              >
-                Get Started
-              </Link>
-            </div>
+            <span className="font-headline text-xl font-bold text-slate-900">DocRAG</span>
+          </Link>
+
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500">
+            <a href="#features" className="hover:text-indigo-600 transition-colors">
+              Features
+            </a>
+            <a href="#how-it-works" className="hover:text-indigo-600 transition-colors">
+              How it Works
+            </a>
+            <a href="#use-cases" className="hover:text-indigo-600 transition-colors">
+              Use Cases
+            </a>
+            <Link to="/guide" className="hover:text-indigo-600 transition-colors">
+              Guide
+            </Link>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleTryDemo}
+              className="hidden sm:inline-flex px-4 py-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors cursor-pointer"
+            >
+              Try Demo
+            </button>
+            <Link
+              to="/upload"
+              className="primary-gradient text-white text-sm font-semibold px-5 py-2.5 rounded-full shadow-md shadow-indigo-200/50 hover:opacity-90 transition-opacity"
+            >
+              Get Started
+            </Link>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-24">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-24">
-          <div className="text-center">
-            <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 rounded-full text-sm font-medium mb-8">
-              <span className="mr-2">🚀</span>
-              AI-Powered Document Intelligence
-            </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 tracking-tight mb-6">
-              Generate Professional
-              <br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Documents in Seconds
-              </span>
-            </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10 leading-relaxed">
-              Upload your reference materials, select a template, and let AI create
-              polished proposals, contracts, and reports — all grounded in your actual content
-              with traceable citations.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/upload"
-                className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 cursor-pointer"
-              >
-                Start Building
-                <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
-              <button
-                onClick={handleTryDemo}
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-700 font-semibold rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all cursor-pointer"
-              >
-                <span className="mr-2">✨</span>
-                Try Demo Mode
-              </button>
-            </div>
+      {/* ───────── Hero ───────── */}
+      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-28 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-indigo-100/50 blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-cyan-100/40 blur-3xl pointer-events-none" />
 
-            {/* Stats */}
-            <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
-                  <div className="text-sm text-gray-500">{stat.label}</div>
-                </div>
-              ))}
-            </div>
+        <div className="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-600 text-xs font-semibold tracking-widest uppercase mb-8 border border-indigo-100">
+            <span className="material-symbols-outlined text-base" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+            Next-Gen AI Analysis
           </div>
 
-          {/* Hero Visual */}
-          <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-gray-50 to-transparent z-10 pointer-events-none" />
-            <div className="bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden mx-auto max-w-5xl">
-              <div className="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
-                <div className="w-3 h-3 rounded-full bg-red-400" />
-                <div className="w-3 h-3 rounded-full bg-yellow-400" />
-                <div className="w-3 h-3 rounded-full bg-green-400" />
-                <span className="ml-4 text-sm text-gray-500">DocRAG - AI Document Generator</span>
-              </div>
-              <div className="p-8 bg-gradient-to-br from-gray-50 to-white">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl mb-4">📄</div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Upload References</h4>
-                    <p className="text-sm text-gray-500">Past proposals, contracts, reports</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl mb-4">🎨</div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Choose Template</h4>
-                    <p className="text-sm text-gray-500">8+ professional templates</p>
-                  </div>
-                  <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center text-xl mb-4">📥</div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Export Anywhere</h4>
-                    <p className="text-sm text-gray-500">PDF, DOCX, or Markdown</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+          <h1 className="font-headline text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.08] mb-6">
+            Semantic Document
+            <br />
+            <span className="bg-gradient-to-r from-indigo-600 to-cyan-600 bg-clip-text text-transparent">Intelligence</span>
+          </h1>
 
-      {/* Templates Section */}
-      <section id="templates" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Professional Templates
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Start with proven structures for any business document
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-4">
-            {templates.map((template) => (
-              <Link
-                key={template.name}
-                to="/draft"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gray-50 rounded-full text-gray-700 font-medium hover:bg-gray-100 hover:shadow-md transition-all cursor-pointer"
-              >
-                <span>{template.icon}</span>
-                {template.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+          <p className="mx-auto max-w-2xl text-lg text-slate-500 leading-relaxed mb-10">
+            Upload any corpus, ask complex questions, and receive accurate, cited
+            answers in seconds — powered by retrieval-augmented generation and
+            high-dimensional vector search.
+          </p>
 
-      {/* Features Section */}
-      <section id="features" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Complete Document Intelligence
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From search to generation, everything you need to work smarter with documents
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {features.map((feature) => (
-              <Link
-                key={feature.title}
-                to={feature.link}
-                className="group relative bg-white p-8 rounded-2xl border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all cursor-pointer"
-              >
-                <div className={`inline-flex items-center justify-center w-14 h-14 ${feature.color} rounded-xl text-2xl mb-6 shadow-lg`}>
-                  {feature.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
-                <div className="mt-4 inline-flex items-center text-blue-600 font-medium">
-                  Try it now
-                  <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Three Steps to Professional Documents
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From upload to export in under a minute
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {steps.map((item, index) => (
-              <div key={item.step} className="relative">
-                {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 to-transparent -translate-x-1/2" />
-                )}
-                <div className="bg-gradient-to-br from-gray-50 to-white p-8 rounded-2xl border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">{item.step}</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-14">
             <Link
-              to="/guide"
-              className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700 cursor-pointer"
+              to="/upload"
+              className="primary-gradient text-white font-semibold px-8 py-4 rounded-2xl text-base shadow-lg shadow-indigo-300/40 hover:shadow-xl hover:shadow-indigo-300/50 transition-all flex items-center gap-2"
             >
-              Read the full guide
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <span className="material-symbols-outlined text-xl">rocket_launch</span>
+              Start Analyzing
             </Link>
+            <button
+              onClick={handleTryDemo}
+              className="bg-white font-semibold px-8 py-4 rounded-2xl text-base text-slate-700 border border-slate-200 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all flex items-center gap-2 cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-xl text-indigo-500">play_circle</span>
+              Try Demo Mode
+            </button>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs font-medium text-slate-400">
+            <span className="uppercase tracking-wider">Optimized For</span>
+            {['Legal Contracts', 'Technical Manuals', 'Research Papers'].map((tag) => (
+              <span
+                key={tag}
+                className="px-3 py-1 rounded-full bg-slate-100 text-slate-500"
+              >
+                {tag}
+              </span>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Use Cases Section */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* ───────── Bento Stats ───────── */}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="bg-white rounded-3xl p-8 flex flex-col justify-end border border-slate-100 shadow-sm">
+              <span className="font-headline text-4xl font-extrabold text-indigo-600">500M+</span>
+              <span className="mt-1 text-sm text-slate-500">Tokens Processed</span>
+            </div>
+            <div className="bg-white rounded-3xl p-8 flex flex-col justify-end border border-slate-100 shadow-sm">
+              <span className="font-headline text-4xl font-extrabold text-emerald-600">99.9%</span>
+              <span className="mt-1 text-sm text-slate-500">Citation Accuracy</span>
+            </div>
+            <div className="bg-white rounded-3xl p-8 flex flex-col justify-end border border-slate-100 shadow-sm">
+              <span className="font-headline text-4xl font-extrabold text-cyan-600">12ms</span>
+              <span className="mt-1 text-sm text-slate-500">Avg Retrieval</span>
+            </div>
+            <div className="bg-white rounded-3xl p-8 flex flex-col justify-end border border-slate-100 shadow-sm">
+              <span className="font-headline text-4xl font-extrabold text-violet-600">4-in-1</span>
+              <span className="mt-1 text-sm text-slate-500">Integrated Workflow</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───────── Features ───────── */}
+      <section id="features" className="py-24 bg-slate-50/80">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Built for Teams That Move Fast
+            <h2 className="font-headline text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+              Everything You Need
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Stop spending hours on document formatting — focus on what matters
+            <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+              Four integrated tools that cover the entire document intelligence workflow.
             </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {useCases.map((useCase) => (
-              <div
-                key={useCase.title}
-                className="text-center p-8 rounded-2xl bg-white border border-gray-200 hover:shadow-md transition-all"
+            {features.map((f) => (
+              <Link
+                key={f.title}
+                to={f.link}
+                className="group bg-white rounded-3xl p-8 border border-slate-100 hover:shadow-lg hover:border-slate-200 transition-all"
               >
-                <div className="text-4xl mb-4">{useCase.icon}</div>
-                <h3 className="font-semibold text-gray-900 mb-2">{useCase.title}</h3>
-                <p className="text-sm text-gray-600">{useCase.description}</p>
+                <div className={`w-12 h-12 rounded-2xl ${f.iconBg} flex items-center justify-center mb-6`}>
+                  <span className={`material-symbols-outlined ${f.iconColor} text-2xl`}>
+                    {f.icon}
+                  </span>
+                </div>
+                <h3 className="font-headline text-lg font-semibold text-slate-900 mb-2 group-hover:text-indigo-600 transition-colors">
+                  {f.title}
+                </h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{f.description}</p>
+                <div className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                  Open
+                  <span className="material-symbols-outlined text-base">arrow_forward</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ───────── How It Works ───────── */}
+      <section id="how-it-works" className="py-24 bg-white">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <h2 className="font-headline text-3xl sm:text-4xl font-bold text-slate-900 mb-12">
+                How It Works
+              </h2>
+
+              <ol className="space-y-10">
+                {steps.map((s) => (
+                  <li key={s.num} className="flex gap-6">
+                    <div className={`flex-shrink-0 w-12 h-12 rounded-full ${s.iconBg} flex items-center justify-center font-headline text-lg font-bold ${s.numColor}`}>
+                      {s.num}
+                    </div>
+                    <div>
+                      <h3 className="font-headline text-lg font-semibold text-slate-900 mb-1">
+                        {s.title}
+                      </h3>
+                      <p className="text-slate-500 text-sm leading-relaxed">
+                        {s.description}
+                      </p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+
+              <div className="mt-10">
+                <Link
+                  to="/guide"
+                  className="group inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600"
+                >
+                  <span className="group-hover:underline underline-offset-2">Read the full guide</span>
+                  <span className="material-symbols-outlined text-base">arrow_forward</span>
+                </Link>
+              </div>
+            </div>
+
+            {/* App screen mockup */}
+            <div className="rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-300/30 overflow-hidden">
+              {/* Browser chrome */}
+              <div className="flex items-center gap-2 px-4 py-2.5 bg-slate-100 border-b border-slate-200">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                <div className="flex-1 mx-3 px-3 py-1 bg-white rounded-md text-[10px] text-slate-400 font-medium truncate">
+                  docrag.ai/chat
+                </div>
+              </div>
+
+              {/* App UI */}
+              <div className="flex h-[340px]">
+                {/* Mini sidebar */}
+                <div className="w-14 bg-slate-50 border-r border-slate-100 flex flex-col items-center py-3 gap-1 flex-shrink-0">
+                  <div className="w-7 h-7 rounded-md primary-gradient flex items-center justify-center mb-3">
+                    <span className="text-white text-[8px] font-bold">D</span>
+                  </div>
+                  {['upload_file', 'search', 'chat', 'edit_note', 'auto_stories'].map((icon, i) => (
+                    <div
+                      key={icon}
+                      className={`w-8 h-8 rounded-md flex items-center justify-center ${
+                        i === 2 ? 'bg-white shadow-sm' : ''
+                      }`}
+                    >
+                      <span
+                        className={`material-symbols-outlined text-[16px] ${
+                          i === 2 ? 'text-indigo-600' : 'text-slate-400'
+                        }`}
+                        style={i === 2 ? { fontVariationSettings: "'FILL' 1" } : undefined}
+                      >
+                        {icon}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Doc sidebar */}
+                <div className="w-36 border-r border-slate-100 bg-white flex flex-col flex-shrink-0">
+                  <div className="px-3 py-2.5 border-b border-slate-100">
+                    <div className="text-[10px] font-bold text-slate-700">Documents</div>
+                    <div className="text-[9px] text-slate-400">3 selected</div>
+                  </div>
+                  <div className="flex-1 px-2 py-2 space-y-1.5 overflow-hidden">
+                    {['contract_v2.pdf', 'q3_review.docx', 'policy_doc.pdf'].map((name) => (
+                      <div key={name} className="flex items-center gap-1.5 px-2 py-1.5 rounded-md bg-indigo-50/60 border border-indigo-100/60">
+                        <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 flex-shrink-0" />
+                        <span className="text-[9px] font-medium text-slate-600 truncate">{name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Chat area */}
+                <div className="flex-1 flex flex-col bg-white min-w-0">
+                  <div className="px-4 py-2.5 border-b border-slate-100">
+                    <div className="text-[11px] font-bold text-slate-800">Document Q&A</div>
+                  </div>
+                  <div className="flex-1 px-4 py-3 space-y-3 overflow-hidden">
+                    {/* User message */}
+                    <div className="flex justify-end">
+                      <div className="primary-gradient text-white rounded-xl rounded-br-sm px-3 py-2 max-w-[75%]">
+                        <p className="text-[10px] leading-relaxed">What are the key liability clauses?</p>
+                      </div>
+                    </div>
+                    {/* AI response */}
+                    <div className="flex justify-start">
+                      <div className="bg-slate-50 border border-slate-100 rounded-xl rounded-bl-sm px-3 py-2 max-w-[80%] space-y-1.5">
+                        <p className="text-[10px] text-slate-700 leading-relaxed">
+                          Based on the contract, there are <span className="font-semibold">three main liability clauses</span>:
+                        </p>
+                        <p className="text-[10px] text-slate-500 leading-relaxed">
+                          1. Limitation of liability capped at total fees paid...
+                        </p>
+                        <div className="flex items-center gap-1 pt-1 border-t border-slate-100 mt-1.5">
+                          <span className="material-symbols-outlined text-indigo-500 text-[10px]">description</span>
+                          <span className="text-[8px] text-indigo-600 font-medium">contract_v2.pdf · p.12</span>
+                          <span className="text-[8px] font-bold text-emerald-600 bg-emerald-50 px-1 py-px rounded ml-auto">high</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Input */}
+                  <div className="px-3 py-2 border-t border-slate-100 flex gap-2">
+                    <div className="flex-1 px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[9px] text-slate-400">
+                      Ask a question...
+                    </div>
+                    <div className="px-2.5 py-1.5 primary-gradient rounded-lg flex items-center">
+                      <span className="material-symbols-outlined text-white text-[12px]">send</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ───────── Use Cases ───────── */}
+      <section id="use-cases" className="py-24 bg-slate-50/80">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8 text-center">
+          <h2 className="font-headline text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+            Built for Every Knowledge Worker
+          </h2>
+          <p className="text-slate-500 text-lg max-w-2xl mx-auto mb-14">
+            From legal discovery to academic research, DocRAG adapts to your domain.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {useCases.map((uc) => (
+              <div
+                key={uc.title}
+                className="bg-white rounded-3xl p-8 text-center border border-slate-100 hover:shadow-md hover:border-slate-200 transition-all"
+              >
+                <div className={`w-14 h-14 mx-auto rounded-2xl ${uc.iconBg} flex items-center justify-center mb-5`}>
+                  <span className={`material-symbols-outlined ${uc.iconColor} text-2xl`}>{uc.icon}</span>
+                </div>
+                <h3 className="font-headline font-semibold text-slate-900 mb-2">{uc.title}</h3>
+                <p className="text-sm text-slate-500 leading-relaxed">{uc.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Technical Section */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      {/* ───────── Technical RAG Block ───────── */}
+      <section className="py-24 bg-slate-900 text-white">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-                Powered by RAG Technology
+              <h2 className="font-headline text-3xl sm:text-4xl font-bold mb-6">
+                Powered by Retrieval-Augmented Generation
               </h2>
-              <p className="text-lg text-gray-600 mb-8">
-                Unlike generic AI tools, DocRAG uses Retrieval-Augmented Generation to ground
-                every response in your actual documents. No hallucinations — just accurate,
-                cited content you can trust.
+              <p className="text-slate-400 text-lg mb-8 leading-relaxed">
+                Unlike generic AI tools, every response is grounded in your uploaded
+                documents. The pipeline retrieves the most relevant chunks before
+                generating an answer — eliminating hallucinations and providing
+                verifiable citations.
               </p>
-              <ul className="space-y-4">
-                {[
-                  'Semantic search understands meaning, not just keywords',
-                  'Every answer includes traceable source citations',
-                  'Your documents stay private and secure',
-                  'Export to PDF, DOCX, or Markdown instantly',
-                  'Professional templates for every use case',
-                  'Context-aware generation matches your style',
-                ].map((item) => (
-                  <li key={item} className="flex items-start">
-                    <svg className="w-6 h-6 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-gray-700">{item}</span>
+              <ul className="space-y-3">
+                {ragAdvantages.map((adv) => (
+                  <li key={adv} className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-emerald-400 text-xl mt-0.5" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      check_circle
+                    </span>
+                    <span className="text-slate-300">{adv}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-gray-900 rounded-2xl p-8 text-white font-mono text-sm overflow-hidden">
-              <div className="flex items-center gap-2 mb-6 text-gray-400">
-                <span className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="w-3 h-3 rounded-full bg-yellow-500" />
-                <span className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="ml-2">RAG Pipeline</span>
+
+            <div className="bg-slate-800/80 rounded-3xl p-8 font-mono text-sm leading-relaxed overflow-x-auto border border-slate-700/50">
+              <div className="flex items-center gap-2 mb-6 text-slate-500">
+                <span className="w-3 h-3 rounded-full bg-red-400/60" />
+                <span className="w-3 h-3 rounded-full bg-amber-400/60" />
+                <span className="w-3 h-3 rounded-full bg-green-400/60" />
+                <span className="ml-2 text-xs text-slate-500">rag_pipeline.py</span>
               </div>
-              <div className="space-y-3">
-                <div><span className="text-blue-400">1.</span> <span className="text-gray-300">Document Upload</span></div>
-                <div className="pl-4 text-gray-500">→ Parse PDF/DOCX content</div>
-                <div><span className="text-blue-400">2.</span> <span className="text-gray-300">Smart Chunking</span></div>
-                <div className="pl-4 text-gray-500">→ Preserve semantic context</div>
-                <div><span className="text-blue-400">3.</span> <span className="text-gray-300">Vector Embedding</span></div>
-                <div className="pl-4 text-gray-500">→ OpenAI text-embedding-3-small</div>
-                <div><span className="text-blue-400">4.</span> <span className="text-gray-300">Vector Index</span></div>
-                <div className="pl-4 text-gray-500">→ Pinecone for fast retrieval</div>
-                <div><span className="text-blue-400">5.</span> <span className="text-gray-300">RAG Generation</span></div>
-                <div className="pl-4 text-gray-500">→ GPT-4 + retrieved context</div>
-              </div>
+              <pre className="text-slate-300 whitespace-pre">
+{`# 1. Chunk & embed documents
+chunks  = split(doc, max_tokens=512)
+vectors = embed(chunks, model="text-embedding-3-small")
+index.upsert(vectors)
+
+# 2. Retrieve relevant context
+query_vec = embed(query)
+results   = index.query(query_vec, top_k=8)
+
+# 3. Generate grounded answer
+answer = llm.chat(
+    system="Use ONLY the provided context.",
+    context=results,
+    question=query,
+)`}
+              </pre>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Document Workflow?
+      {/* ───────── Bottom CTA Band ───────── */}
+      <section className="py-20 bg-white">
+        <div className="mx-auto max-w-4xl px-6 lg:px-8 text-center">
+          <h2 className="font-headline text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
+            Ready to Analyze Your Documents?
           </h2>
-          <p className="text-xl text-blue-100 mb-10">
-            Join teams who create professional documents 10x faster with AI-powered generation.
+          <p className="text-slate-500 text-lg mb-10 max-w-2xl mx-auto">
+            Start extracting insights from your corpus in under a minute — no configuration required.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               to="/upload"
-              className="inline-flex items-center justify-center px-10 py-5 bg-white text-blue-600 font-semibold rounded-xl hover:bg-gray-100 transition-all shadow-lg text-lg cursor-pointer"
+              className="primary-gradient text-white font-semibold px-10 py-4 rounded-2xl text-base shadow-lg shadow-indigo-300/40 hover:shadow-xl transition-all flex items-center gap-2"
             >
               Get Started Free
-              <svg className="ml-3 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
+              <span className="material-symbols-outlined text-xl">arrow_forward</span>
             </Link>
             <button
               onClick={handleTryDemo}
-              className="inline-flex items-center justify-center px-10 py-5 bg-transparent text-white font-semibold rounded-xl border-2 border-white/30 hover:bg-white/10 transition-all text-lg cursor-pointer"
+              className="bg-white font-semibold px-10 py-4 rounded-2xl text-base text-slate-700 border border-slate-200 hover:border-indigo-200 hover:bg-indigo-50/50 transition-all flex items-center gap-2 cursor-pointer"
             >
-              <span className="mr-2">✨</span>
+              <span className="material-symbols-outlined text-xl text-indigo-500">play_circle</span>
               Try Demo First
             </button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-                <span className="text-white text-sm font-bold">D</span>
+      {/* ───────── Footer ───────── */}
+      <footer className="bg-slate-50 border-t border-slate-200/60 py-16">
+        <div className="mx-auto max-w-7xl px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+            <div className="col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2.5 mb-4">
+                <div className="w-8 h-8 primary-gradient rounded-lg flex items-center justify-center shadow-sm">
+                  <span className="text-white text-sm font-bold">D</span>
+                </div>
+                <span className="font-headline text-lg font-bold text-slate-900">DocRAG</span>
               </div>
-              <span className="text-2xl font-bold text-white">DocRAG</span>
-              <span className="ml-4 text-sm">AI Document Intelligence</span>
+              <p className="text-sm text-slate-500 leading-relaxed">
+                AI-powered document intelligence built on retrieval-augmented generation.
+              </p>
             </div>
-            <div className="flex items-center gap-8">
-              <Link to="/upload" className="hover:text-white transition-colors cursor-pointer">Upload</Link>
-              <Link to="/search" className="hover:text-white transition-colors cursor-pointer">Search</Link>
-              <Link to="/chat" className="hover:text-white transition-colors cursor-pointer">Chat</Link>
-              <Link to="/draft" className="hover:text-white transition-colors cursor-pointer">Draft</Link>
-              <Link to="/guide" className="hover:text-white transition-colors cursor-pointer">Guide</Link>
+
+            <div>
+              <h4 className="font-semibold text-slate-900 text-sm mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-slate-500">
+                <li><Link to="/upload" className="hover:text-indigo-600 transition-colors">Upload</Link></li>
+                <li><Link to="/search" className="hover:text-indigo-600 transition-colors">Search</Link></li>
+                <li><Link to="/chat" className="hover:text-indigo-600 transition-colors">Chat</Link></li>
+                <li><Link to="/draft" className="hover:text-indigo-600 transition-colors">Draft</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-slate-900 text-sm mb-4">Resources</h4>
+              <ul className="space-y-2 text-sm text-slate-500">
+                <li><Link to="/guide" className="hover:text-indigo-600 transition-colors">Guide</Link></li>
+                <li><a href="#how-it-works" className="hover:text-indigo-600 transition-colors">How it Works</a></li>
+                <li><a href="#use-cases" className="hover:text-indigo-600 transition-colors">Use Cases</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold text-slate-900 text-sm mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-slate-500">
+                <li><a href="#" className="hover:text-indigo-600 transition-colors">About</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition-colors">Privacy</a></li>
+                <li><a href="#" className="hover:text-indigo-600 transition-colors">Terms</a></li>
+              </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-800 text-center text-sm">
-            <p>Built with RAG technology — Your documents, intelligently analyzed</p>
-            <p className="mt-2 text-gray-500">&copy; {new Date().getFullYear()} DocRAG. All rights reserved.</p>
+
+          <div className="mt-12 pt-8 border-t border-slate-200/60 text-center text-xs text-slate-400">
+            &copy; {new Date().getFullYear()} DocRAG. All rights reserved.
           </div>
         </div>
       </footer>
