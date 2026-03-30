@@ -336,29 +336,31 @@ export function GuidePage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-sidebar text-white rounded-2xl p-10 lg:p-14 text-center space-y-6 relative overflow-hidden noise-overlay">
-          <div className="absolute inset-0 dot-grid-dark" />
+        <section className="rounded-2xl p-10 lg:p-14 text-center space-y-6 relative overflow-hidden bg-gradient-to-br from-violet-50 via-white to-cyan-50 border border-violet-200/50">
+          <div className="absolute inset-0 dot-grid opacity-30" />
+          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-violet-200/30 blur-[80px] pointer-events-none" />
+          <div className="absolute -bottom-20 -left-20 w-56 h-56 rounded-full bg-cyan-200/20 blur-[80px] pointer-events-none" />
           <div className="relative">
-            <h2 className="text-3xl lg:text-4xl font-black font-headline tracking-tight">
+            <h2 className="text-3xl lg:text-4xl font-black font-headline tracking-tight text-neutral-900">
               Get Started Now
             </h2>
-            <p className="max-w-xl mx-auto text-base text-slate-400 leading-relaxed mt-4">
+            <p className="max-w-xl mx-auto text-base text-neutral-500 leading-relaxed mt-4">
               Upload your first document and experience AI-powered document intelligence — search,
               chat, and draft in minutes.
             </p>
             <div className="flex flex-wrap justify-center gap-4 mt-8">
               <AuthAwareAppLink
                 to="/upload"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-gradient-to-r from-violet-600 to-cyan-500 text-white font-bold shadow-lg shadow-violet-500/25 hover:shadow-xl hover:-translate-y-px transition-all"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl primary-gradient text-white font-bold shadow-lg shadow-violet-500/20 hover:shadow-xl hover:shadow-violet-500/25 hover:-translate-y-px transition-all"
               >
                 <span className="material-symbols-outlined text-xl">upload_file</span>
                 Upload Documents
               </AuthAwareAppLink>
               <a
                 href="mailto:aarav8090shukla@gmail.com"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-slate-600 font-bold hover:bg-white/5 transition-colors text-slate-300"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl border border-neutral-200 bg-white font-bold hover:border-violet-300 hover:bg-violet-50/50 transition-all text-neutral-700 shadow-sm"
               >
-                <span className="material-symbols-outlined text-xl">mail</span>
+                <span className="material-symbols-outlined text-xl text-violet-500">mail</span>
                 Contact
               </a>
             </div>
