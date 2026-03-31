@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
 import { api } from '../api/client';
 import { DocumentList } from '../components/DocumentList';
+import { StreamingMarkdown } from '../components/StreamingMarkdown';
 import type { Document, QAResponse } from '../api/types';
 
 interface Message {
@@ -235,67 +235,7 @@ export function ChatPage() {
                 {message.role === 'user' ? (
                   <p className="whitespace-pre-wrap">{message.content}</p>
                 ) : (
-                  <div className="chat-markdown text-on-surface">
-                    <ReactMarkdown
-                      components={{
-                        p: ({ children }) => (
-                          <p className="mb-3 last:mb-0 leading-relaxed">{children}</p>
-                        ),
-                        h1: ({ children }) => (
-                          <h2 className="text-lg font-bold mb-2 mt-4 first:mt-0 text-neutral-900 font-headline">{children}</h2>
-                        ),
-                        h2: ({ children }) => (
-                          <h3 className="text-base font-bold mb-2 mt-3 text-neutral-900 font-headline">{children}</h3>
-                        ),
-                        h3: ({ children }) => (
-                          <h4 className="text-sm font-bold mb-1 mt-2 text-neutral-900">{children}</h4>
-                        ),
-                        ul: ({ children }) => (
-                          <ul className="list-disc pl-5 mb-3 space-y-1">{children}</ul>
-                        ),
-                        ol: ({ children }) => (
-                          <ol className="list-decimal pl-5 mb-3 space-y-1">{children}</ol>
-                        ),
-                        li: ({ children }) => (
-                          <li className="leading-relaxed">{children}</li>
-                        ),
-                        strong: ({ children }) => (
-                          <strong className="font-bold text-neutral-900">{children}</strong>
-                        ),
-                        em: ({ children }) => (
-                          <em className="italic">{children}</em>
-                        ),
-                        code: ({ className, children }) => {
-                          const isInline = !className;
-                          return isInline ? (
-                            <code className="bg-neutral-100 px-1.5 py-0.5 rounded text-sm font-mono text-neutral-800">
-                              {children}
-                            </code>
-                          ) : (
-                            <code className={className}>{children}</code>
-                          );
-                        },
-                        pre: ({ children }) => (
-                          <pre className="bg-sidebar text-slate-200 p-4 rounded-xl overflow-x-auto my-3 text-sm font-mono">
-                            {children}
-                          </pre>
-                        ),
-                        blockquote: ({ children }) => (
-                          <blockquote className="border-l-4 border-violet-400 pl-4 py-1 my-3 bg-violet-50/50 rounded-r-lg text-neutral-600 italic">
-                            {children}
-                          </blockquote>
-                        ),
-                        a: ({ href, children }) => (
-                          <a href={href} className="text-violet-600 hover:underline" target="_blank" rel="noopener noreferrer">
-                            {children}
-                          </a>
-                        ),
-                        hr: () => <hr className="my-4 border-neutral-200" />,
-                      }}
-                    >
-                      {message.content}
-                    </ReactMarkdown>
-                  </div>
+                  <StreamingMarkdown text={message.content} />
                 )}
 
                 {message.sources && message.sources.length > 0 && (

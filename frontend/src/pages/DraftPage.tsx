@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
-import ReactMarkdown from 'react-markdown';
 import { api } from '../api/client';
 import { DocumentList } from '../components/DocumentList';
+import { StreamingMarkdown } from '../components/StreamingMarkdown';
 import { templates, type DocumentTemplate } from '../lib/templates';
 import { exportToPdf, exportToDocx, exportToMarkdown } from '../lib/exportUtils';
 import { demoDocuments, type DemoDocument } from '../lib/demoData';
@@ -885,58 +885,8 @@ For questions or to proceed, please contact our team.
                     </>
                   ) : draft ? (
                     activeTab === 'preview' ? (
-                      <div className="p-10 prose prose-sm max-w-none prose-headings:text-on-surface prose-p:text-on-surface-variant prose-li:text-on-surface-variant prose-strong:text-on-surface">
-                        <ReactMarkdown
-                          components={{
-                            h1: ({ children }) => (
-                              <h1 className="text-2xl font-extrabold text-neutral-900 mb-4 pb-2 border-b border-neutral-200">
-                                {children}
-                              </h1>
-                            ),
-                            h2: ({ children }) => (
-                              <h2 className="text-xl font-bold text-on-surface mt-8 mb-4 flex items-center gap-2">
-                                <span className="w-1 h-6 bg-primary rounded-full" />
-                                {children}
-                              </h2>
-                            ),
-                            h3: ({ children }) => (
-                              <h3 className="text-lg font-bold text-on-surface mt-6 mb-3">{children}</h3>
-                            ),
-                            p: ({ children }) => (
-                              <p className="text-on-surface-variant leading-relaxed mb-4">{children}</p>
-                            ),
-                            ul: ({ children }) => (
-                              <ul className="list-disc list-inside space-y-2 mb-4 text-on-surface-variant">
-                                {children}
-                              </ul>
-                            ),
-                            ol: ({ children }) => (
-                              <ol className="list-decimal list-inside space-y-2 mb-4 text-on-surface-variant">
-                                {children}
-                              </ol>
-                            ),
-                            li: ({ children }) => (
-                              <li className="text-on-surface-variant">{children}</li>
-                            ),
-                            blockquote: ({ children }) => (
-                              <blockquote className="border-l-4 border-primary pl-4 italic text-on-surface-variant my-4">
-                                {children}
-                              </blockquote>
-                            ),
-                            code: ({ children }) => (
-                              <code className="bg-neutral-100 px-1.5 py-0.5 rounded text-sm text-on-surface">
-                                {children}
-                              </code>
-                            ),
-                            pre: ({ children }) => (
-                              <pre className="bg-gray-900 text-gray-100 p-4 rounded-xl overflow-x-auto my-4">
-                                {children}
-                              </pre>
-                            ),
-                          }}
-                        >
-                          {draft.draft}
-                        </ReactMarkdown>
+                      <div className="p-10">
+                        <StreamingMarkdown text={draft.draft} variant="draft" />
                       </div>
                     ) : (
                       <div className="p-6">

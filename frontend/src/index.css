@@ -433,3 +433,218 @@ html {
 .gradient-border:hover::before {
   opacity: 1;
 }
+
+/* ═══════════════════════════════════════════════════
+   STREAMING MARKDOWN RENDERER
+   ═══════════════════════════════════════════════════ */
+
+.markdown-body {
+  font-size: 15px;
+  line-height: 1.7;
+  color: inherit;
+  word-break: break-word;
+}
+
+/* Headings */
+.markdown-body .markdown-h1 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 20px 0 10px;
+  color: #171717;
+  font-family: 'Red Hat Display', sans-serif;
+}
+
+.markdown-body .markdown-h1:first-child { margin-top: 0; }
+
+.markdown-body .markdown-h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  color: #171717;
+  font-family: 'Red Hat Display', sans-serif;
+}
+
+.markdown-body .markdown-h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 14px 0 6px;
+  color: #171717;
+}
+
+/* Paragraphs */
+.markdown-body p {
+  margin: 8px 0;
+  line-height: 1.7;
+}
+
+.markdown-body p:last-child { margin-bottom: 0; }
+
+/* Inline code */
+.markdown-body .inline-code {
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 13px;
+}
+
+/* Code block wrapper */
+.markdown-body .code-block {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+
+.markdown-body .code-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: #1a1a2e;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.markdown-body .code-lang {
+  font-size: 12px;
+  font-family: monospace;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.markdown-body .copy-btn {
+  font-size: 12px;
+  padding: 2px 8px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.markdown-body .copy-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Lists */
+.markdown-body .markdown-ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.markdown-body .markdown-ol {
+  list-style-type: decimal;
+  padding-left: 20px;
+  margin: 8px 0;
+}
+
+.markdown-body .markdown-li {
+  margin-bottom: 4px;
+  line-height: 1.6;
+}
+
+/* Strong */
+.markdown-body .markdown-strong {
+  font-weight: 700;
+  color: #171717;
+}
+
+/* Blockquote */
+.markdown-body .markdown-blockquote {
+  border-left: 3px solid #7c3aed;
+  margin: 12px 0;
+  padding: 6px 0 6px 16px;
+  color: #525252;
+  background: rgba(124, 58, 237, 0.04);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+}
+
+/* Tables */
+.markdown-body .markdown-table-wrapper {
+  overflow-x: auto;
+  margin: 12px 0;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.markdown-body .markdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.markdown-body .markdown-th {
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.12);
+  background: rgba(0, 0, 0, 0.03);
+  color: #171717;
+}
+
+.markdown-body .markdown-td {
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.markdown-body tr:last-child .markdown-td {
+  border-bottom: none;
+}
+
+/* Links */
+.markdown-body .markdown-link {
+  color: #7c3aed;
+  text-decoration: none;
+}
+
+.markdown-body .markdown-link:hover {
+  text-decoration: underline;
+}
+
+/* Horizontal rule */
+.markdown-body .markdown-hr {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  margin: 16px 0;
+}
+
+/* ── Draft page variant — larger text for document preview ── */
+.markdown-body--draft .markdown-h1 {
+  font-size: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.markdown-body--draft .markdown-h2 {
+  font-size: 20px;
+  margin-top: 32px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.markdown-body--draft .markdown-h2::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 24px;
+  background: #5b21b6;
+  border-radius: 9999px;
+  flex-shrink: 0;
+}
+
+.markdown-body--draft .markdown-h3 {
+  font-size: 18px;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.markdown-body--draft p {
+  margin-bottom: 16px;
+  color: #525252;
+}
