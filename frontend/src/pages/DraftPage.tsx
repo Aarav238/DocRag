@@ -51,7 +51,7 @@ export function DraftPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'preview' | 'raw'>('preview');
+  const [activeTab, setActiveTab] = useState<'preview' | 'edit' | 'raw'>('preview');
   const [showTemplates, setShowTemplates] = useState(true);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showDocSelector, setShowDocSelector] = useState(false);
@@ -757,26 +757,19 @@ For questions or to proceed, please contact our team.
               {/* Tabs & Actions */}
               <div className="flex items-center justify-between flex-shrink-0">
                 <div className="flex bg-neutral-100 p-1 rounded-lg">
-                  <button
-                    onClick={() => setActiveTab('preview')}
-                    className={`px-6 py-1.5 rounded-md text-sm font-bold transition-all cursor-pointer ${
-                      activeTab === 'preview'
-                        ? 'bg-white shadow-sm text-primary'
-                        : 'text-neutral-500 hover:text-neutral-600'
-                    }`}
-                  >
-                    Preview
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('raw')}
-                    className={`px-6 py-1.5 rounded-md text-sm font-medium transition-all cursor-pointer ${
-                      activeTab === 'raw'
-                        ? 'bg-white shadow-sm text-primary font-bold'
-                        : 'text-neutral-500 hover:text-neutral-600'
-                    }`}
-                  >
-                    Markdown
-                  </button>
+                  {(['preview', 'edit', 'raw'] as const).map((tab) => (
+                    <button
+                      key={tab}
+                      onClick={() => setActiveTab(tab)}
+                      className={`px-5 py-1.5 rounded-md text-sm transition-all cursor-pointer ${
+                        activeTab === tab
+                          ? 'bg-white shadow-sm text-primary font-bold'
+                          : 'text-neutral-500 hover:text-neutral-600 font-medium'
+                      }`}
+                    >
+                      {tab === 'preview' ? 'Preview' : tab === 'edit' ? 'Edit' : 'Markdown'}
+                    </button>
+                  ))}
                 </div>
                 <div className="flex items-center gap-2">
                   {draft && (
@@ -905,6 +898,21 @@ For questions or to proceed, please contact our team.
                     activeTab === 'preview' ? (
                       <div className="p-10">
                         <StreamingMarkdown text={draft.draft} variant="draft" isStreaming={isGenerating} />
+                      </div>
+                    ) : activeTab === 'edit' ? (
+                      <div className="flex flex-col h-full">
+                        <div className="flex items-center gap-2 px-6 py-2 border-b border-neutral-100 bg-neutral-50/50 flex-shrink-0">
+                          <span className="material-symbols-outlined text-sm text-neutral-400">edit_note</span>
+                          <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Editing Draft</span>
+                          <span className="text-xs text-neutral-300 ml-auto">{draft.draft.length} chars</span>
+                        </div>
+                        <textarea
+                          value={draft.draft}
+                          onChange={(e) => setDraft({ ...draft, draft: e.target.value })}
+                          className="flex-1 w-full p-6 text-sm text-on-surface font-mono leading-relaxed bg-white resize-none outline-none placeholder:text-neutral-300"
+                          placeholder="Start writing your draft..."
+                          spellCheck={false}
+                        />
                       </div>
                     ) : (
                       <div className="p-6">
