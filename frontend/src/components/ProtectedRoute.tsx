@@ -1,5 +1,6 @@
 import { useAuth } from '@clerk/clerk-react';
 import { Navigate, Outlet } from 'react-router-dom';
+import { UserProvider } from '../contexts/UserContext';
 
 export function ProtectedRoute() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -16,5 +17,9 @@ export function ProtectedRoute() {
     return <Navigate to="/sign-in" replace />;
   }
 
-  return <Outlet />;
+  return (
+    <UserProvider>
+      <Outlet />
+    </UserProvider>
+  );
 }

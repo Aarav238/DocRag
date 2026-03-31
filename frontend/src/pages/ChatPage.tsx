@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { useUser } from '@clerk/clerk-react';
 import { api } from '../api/client';
 import { DocumentList } from '../components/DocumentList';
 import { StreamingMarkdown } from '../components/StreamingMarkdown';
+import { useAppUser } from '../contexts/UserContext';
 import type { Document, QAResponse } from '../api/types';
 
 interface Message {
@@ -15,8 +15,7 @@ interface Message {
 
 const getChatStorageKey = (userId: string) => `docrag-chat-history-${userId}`;
 
-const loadStoredMessages = (userId: string | undefined): Message[] => {
-  if (!userId) return [];
+const loadStoredMessages = (userId: string): Message[] => {
   try {
     const stored = localStorage.getItem(getChatStorageKey(userId));
     if (stored) {
@@ -28,8 +27,7 @@ const loadStoredMessages = (userId: string | undefined): Message[] => {
   return [];
 };
 
-const saveMessages = (userId: string | undefined, messages: Message[]) => {
-  if (!userId) return;
+const saveMessages = (userId: string, messages: Message[]) => {
   try {
     localStorage.setItem(getChatStorageKey(userId), JSON.stringify(messages));
   } catch (e) {
@@ -38,11 +36,10 @@ const saveMessages = (userId: string | undefined, messages: Message[]) => {
 };
 
 export function ChatPage() {
-  const { user } = useUser();
-  const userId = user?.id;
+  const { id: userId } = useAppUser();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => loadStoredMessages(userId));
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,13 +50,10 @@ export function ChatPage() {
     api.listDocuments('indexed').then(({ documents }) => setDocuments(documents));
   }, []);
 
-  // Load messages when user changes (login/switch account)
-  // Also clean up the old unscoped key from before this fix
+  // Clean up old unscoped key from before this fix
   useEffect(() => {
     localStorage.removeItem('docrag-chat-history');
-    setMessages(loadStoredMessages(userId));
-    setExpandedSources(new Set());
-  }, [userId]);
+  }, []);
 
   useEffect(() => {
     saveMessages(userId, messages);
