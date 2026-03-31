@@ -1,6 +1,6 @@
 from openai import AsyncOpenAI
 from tenacity import retry, stop_after_attempt, wait_exponential
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, AsyncGenerator
 import logging
 import re
 
@@ -10,6 +10,21 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 
 client = AsyncOpenAI(api_key=settings.openai_api_key)
+
+
+def _detect_confidence(text: str) -> str:
+    """Determine confidence level from response text."""
+    lower = text.lower()
+    low_phrases = [
+        "i couldn't find", "not mentioned", "no information",
+        "cannot determine", "unclear", "not sure", "might be", "possibly",
+    ]
+    medium_phrases = ["may", "could", "appears"]
+    if any(phrase in lower for phrase in low_phrases):
+        return "low"
+    if any(phrase in lower for phrase in medium_phrases):
+        return "medium"
+    return "high"
 
 
 QA_SYSTEM_PROMPT = """You are a helpful, knowledgeable assistant that answers questions based on the user's documents. You communicate in a natural, conversational tone while being accurate and informative.
@@ -89,25 +104,40 @@ Please answer naturally and conversationally, using only the information from th
     )
 
     answer = response.choices[0].message.content
-
-    # Determine confidence based on response
-    confidence = "high"
-    low_confidence_phrases = [
-        "i couldn't find",
-        "not mentioned",
-        "no information",
-        "cannot determine",
-        "unclear",
-        "not sure",
-        "might be",
-        "possibly",
-    ]
-    if any(phrase in answer.lower() for phrase in low_confidence_phrases):
-        confidence = "low"
-    elif any(phrase in answer.lower() for phrase in ["may", "could", "appears"]):
-        confidence = "medium"
-
+    confidence = _detect_confidence(answer)
     return answer, confidence
+
+
+async def generate_answer_stream(question: str, context: str) -> AsyncGenerator[str, None]:
+    """Stream answer tokens for a question based on context."""
+    messages = [
+        {"role": "system", "content": QA_SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": f"""Here's the context from the user's documents:
+
+{context}
+
+---
+
+User's question: {question}
+
+Please answer naturally and conversationally, using only the information from the documents above. If the answer isn't in the documents, let me know.""",
+        },
+    ]
+
+    stream = await client.chat.completions.create(
+        model=settings.openai_chat_model,
+        messages=messages,
+        temperature=0.3,
+        max_tokens=1500,
+        stream=True,
+    )
+
+    async for chunk in stream:
+        delta = chunk.choices[0].delta
+        if delta.content:
+            yield delta.content
 
 
 DRAFT_SYSTEM_PROMPT = """You are an expert professional document writer specializing in creating polished, compelling business documents. You craft content that is clear, persuasive, and tailored to the target audience.
@@ -253,6 +283,74 @@ Generate the complete document now:""",
     parsed_sections = parse_markdown_sections(draft)
 
     return draft, parsed_sections
+
+
+async def generate_draft_stream(
+    instruction: str,
+    reference_excerpts: List[Dict],
+    sections: List[str],
+    style_guidance: str = None,
+) -> AsyncGenerator[str, None]:
+    """Stream draft tokens."""
+    reference_context = ""
+    for ref in reference_excerpts:
+        reference_context += f"\n\n### Reference: {ref['file_name']}\n"
+        for excerpt in ref["excerpts"]:
+            reference_context += f"\n{excerpt}\n"
+
+    sections_str = "\n".join([f"- {s}" for s in sections])
+    style_note = f"\n\nSTYLE GUIDANCE:\n{style_guidance}" if style_guidance else ""
+
+    messages = [
+        {"role": "system", "content": DRAFT_SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": f"""Create a professional document based on the specifications below.
+
+---
+## Document Request
+{instruction}
+
+---
+## Required Sections
+Generate content for each of these sections:
+{sections_str}
+
+---
+## Reference Materials
+Use these excerpts to inform your writing style, tone, terminology, and content approach:
+{reference_context}
+{style_note}
+
+---
+## Output Requirements
+
+1. **Title**: Start with a clear, professional title using # heading
+2. **Sections**: Include ALL required sections using ## headings
+3. **Content**:
+   - Write compelling, professional prose
+   - Use specific details and data from references where available
+   - Maintain consistent tone throughout
+   - Include bullet points and formatting for readability
+4. **Length**: Each section should be substantive (3-6 paragraphs or equivalent)
+5. **Quality**: The document should be ready for professional use with minimal editing
+
+Generate the complete document now:""",
+        },
+    ]
+
+    stream = await client.chat.completions.create(
+        model=settings.openai_chat_model,
+        messages=messages,
+        temperature=0.4,
+        max_tokens=4000,
+        stream=True,
+    )
+
+    async for chunk in stream:
+        delta = chunk.choices[0].delta
+        if delta.content:
+            yield delta.content
 
 
 def parse_markdown_sections(markdown: str) -> List[Dict]:

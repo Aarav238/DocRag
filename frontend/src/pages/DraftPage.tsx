@@ -124,13 +124,31 @@ export function DraftPage() {
           reference_docs: mockDemoDocuments.map((d) => d.file_name),
         });
       } else {
-        const response = await api.generateDraft(
+        // Stream the draft token-by-token
+        const streamingDraft: DraftResponse = {
+          instruction,
+          draft: '',
+          sections: [],
+          reference_docs: [],
+        };
+        setDraft(streamingDraft);
+
+        await api.generateDraftStream(
           instruction,
           selectedDocIds,
+          (chunk) => {
+            setDraft((prev) => prev ? { ...prev, draft: prev.draft + chunk } : prev);
+          },
+          (metadata) => {
+            setDraft((prev) => prev ? {
+              ...prev,
+              sections: metadata.sections.map((s) => ({ title: s.title, content: s.content })),
+              reference_docs: metadata.reference_docs,
+            } : prev);
+          },
           sectionList.length > 0 ? sectionList : undefined,
           styleGuidance.trim() || undefined
         );
-        setDraft(response);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate draft');
@@ -844,9 +862,9 @@ For questions or to proceed, please contact our team.
 
                 {/* Preview Content */}
                 <div className="flex-1 overflow-y-auto relative">
-                  {isGenerating ? (
+                  {isGenerating && !draft?.draft ? (
                     <>
-                      {/* Skeleton */}
+                      {/* Skeleton — only shown before first token arrives */}
                       <div className="p-10 space-y-6">
                         <div className="space-y-4 animate-pulse">
                           <div className="h-8 bg-neutral-100 rounded-lg w-3/4" />
@@ -886,7 +904,7 @@ For questions or to proceed, please contact our team.
                   ) : draft ? (
                     activeTab === 'preview' ? (
                       <div className="p-10">
-                        <StreamingMarkdown text={draft.draft} variant="draft" />
+                        <StreamingMarkdown text={draft.draft} variant="draft" isStreaming={isGenerating} />
                       </div>
                     ) : (
                       <div className="p-6">

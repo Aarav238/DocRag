@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
+from fastapi.responses import StreamingResponse
 from typing import Optional, List
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorDatabase
+import json
 
 from app.core.auth import UserContext, get_current_user
 from app.core.config import get_settings
 from app.core.database import get_db
 from app.services.embedding import get_embedding
 from app.services.vector_store import VectorStore
-from app.services.llm import generate_answer
+from app.services.llm import generate_answer, generate_answer_stream, _detect_confidence
 from app.services.user_documents import intersect_doc_filter
 
 router = APIRouter()
@@ -113,3 +115,74 @@ async def answer_question(
         sources=sources,
         confidence=confidence,
     )
+
+
+@router.post("/stream")
+async def answer_question_stream(
+    request: Request,
+    qa_request: QARequest,
+    db: AsyncIOMotorDatabase = Depends(get_db),
+    user: UserContext = Depends(get_current_user),
+):
+    """Stream an answer token-by-token via SSE."""
+    vector_store: VectorStore = request.app.state.vector_store
+
+    if not vector_store.is_initialized:
+        raise HTTPException(status_code=503, detail="Vector store not initialized")
+
+    filtered = await intersect_doc_filter(db, user.id, qa_request.doc_ids, indexed_only=True)
+    if not filtered:
+        async def no_docs():
+            msg = "No indexed documents are available for your account. Upload and index documents first."
+            yield f"event: chunk\ndata: {json.dumps({'text': msg})}\n\n"
+            yield f"event: sources\ndata: {json.dumps({'sources': [], 'confidence': 'low'})}\n\n"
+            yield "event: done\ndata: {}\n\n"
+        return StreamingResponse(no_docs(), media_type="text/event-stream")
+
+    question_embedding = await get_embedding(qa_request.question)
+    results = await vector_store.search(
+        query_embedding=question_embedding,
+        top_k=qa_request.top_k,
+        doc_ids=filtered,
+    )
+
+    if not results:
+        async def no_results():
+            msg = "I couldn't find any relevant information in the indexed documents to answer this question."
+            yield f"event: chunk\ndata: {json.dumps({'text': msg})}\n\n"
+            yield f"event: sources\ndata: {json.dumps({'sources': [], 'confidence': 'low'})}\n\n"
+            yield "event: done\ndata: {}\n\n"
+        return StreamingResponse(no_results(), media_type="text/event-stream")
+
+    context_parts = []
+    sources_data = []
+    for i, r in enumerate(results):
+        page_info = ""
+        if r.get("page_start"):
+            if r.get("page_end") and r["page_end"] != r["page_start"]:
+                page_info = f" (pages {r['page_start']}-{r['page_end']})"
+            else:
+                page_info = f" (page {r['page_start']})"
+        context_parts.append(f"[Source {i+1}: {r['file_name']}{page_info}]\n{r['text']}")
+        sources_data.append({
+            "chunk_id": r["chunk_id"],
+            "doc_id": r["doc_id"],
+            "file_name": r["file_name"],
+            "page_start": r.get("page_start"),
+            "page_end": r.get("page_end"),
+            "text_excerpt": r["text"][:200] + "..." if len(r["text"]) > 200 else r["text"],
+        })
+
+    context = "\n\n".join(context_parts)
+
+    async def stream_answer():
+        full_answer = []
+        async for token in generate_answer_stream(qa_request.question, context):
+            full_answer.append(token)
+            yield f"event: chunk\ndata: {json.dumps({'text': token})}\n\n"
+
+        confidence = _detect_confidence("".join(full_answer))
+        yield f"event: sources\ndata: {json.dumps({'sources': sources_data, 'confidence': confidence})}\n\n"
+        yield "event: done\ndata: {}\n\n"
+
+    return StreamingResponse(stream_answer(), media_type="text/event-stream")

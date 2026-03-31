@@ -42,6 +42,7 @@ export function ChatPage() {
   const [messages, setMessages] = useState<Message[]>(() => loadStoredMessages(userId));
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedSources, setExpandedSources] = useState<Set<number>>(new Set());
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -75,33 +76,50 @@ export function ChatPage() {
     const question = input.trim();
     setInput('');
     setError(null);
-    setMessages((prev) => [
-      ...prev,
-      { role: 'user', content: question, timestamp: new Date().toISOString() },
-    ]);
+
+    const userMessage: Message = {
+      role: 'user',
+      content: question,
+      timestamp: new Date().toISOString(),
+    };
+    const assistantMessage: Message = {
+      role: 'assistant',
+      content: '',
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages((prev) => [...prev, userMessage, assistantMessage]);
     setIsLoading(true);
+    setIsStreaming(true);
 
     try {
-      const response = await api.askQuestion(
+      await api.askQuestionStream(
         question,
+        (chunk) => {
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            updated[updated.length - 1] = { ...last, content: last.content + chunk };
+            return updated;
+          });
+        },
+        (sources, confidence) => {
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            updated[updated.length - 1] = { ...last, sources, confidence };
+            return updated;
+          });
+        },
         selectedDocIds.length > 0 ? selectedDocIds : undefined
       );
-
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: 'assistant',
-          content: response.answer,
-          sources: response.sources,
-          confidence: response.confidence,
-          timestamp: new Date().toISOString(),
-        },
-      ]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to get answer');
-      setMessages((prev) => prev.slice(0, -1));
+      // Remove both user and empty assistant message on error
+      setMessages((prev) => prev.slice(0, -2));
     } finally {
       setIsLoading(false);
+      setIsStreaming(false);
     }
   };
 
@@ -242,7 +260,10 @@ export function ChatPage() {
                 {message.role === 'user' ? (
                   <p className="whitespace-pre-wrap">{message.content}</p>
                 ) : (
-                  <StreamingMarkdown text={message.content} />
+                  <StreamingMarkdown
+                    text={message.content}
+                    isStreaming={isStreaming && index === messages.length - 1}
+                  />
                 )}
 
                 {message.sources && message.sources.length > 0 && (
@@ -298,21 +319,6 @@ export function ChatPage() {
               </div>
             </div>
           ))}
-
-          {isLoading && (
-            <div className="flex justify-start animate-fade-in">
-              <div className="bg-neutral-50 rounded-2xl p-4 border border-neutral-100">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex gap-1.5">
-                    <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce" />
-                    <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce animation-delay-150" />
-                    <div className="w-2 h-2 bg-violet-400 rounded-full animate-bounce animation-delay-300" />
-                  </div>
-                  <span className="text-neutral-500 text-sm">Thinking...</span>
-                </div>
-              </div>
-            </div>
-          )}
 
           <div ref={messagesEndRef} />
         </div>
