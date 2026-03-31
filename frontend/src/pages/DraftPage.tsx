@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { DocumentList } from '../components/DocumentList';
 import { StreamingMarkdown } from '../components/StreamingMarkdown';
+import { useAppUser } from '../contexts/UserContext';
 import { templates, type DocumentTemplate } from '../lib/templates';
 import { exportToPdf, exportToDocx, exportToMarkdown } from '../lib/exportUtils';
 import { demoDocuments, type DemoDocument } from '../lib/demoData';
@@ -31,7 +32,42 @@ const categoryLabels: Record<string, string> = {
   general: 'Other',
 };
 
+// ── Draft History ────────────────────────────────────────────────────────────
+interface SavedDraft {
+  id: string;
+  title: string;
+  templateName: string;
+  draft: DraftResponse;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const getDraftHistoryKey = (userId: string) => `docrag-draft-history-${userId}`;
+
+function loadDraftHistory(userId: string): SavedDraft[] {
+  try {
+    const stored = localStorage.getItem(getDraftHistoryKey(userId));
+    return stored ? JSON.parse(stored) : [];
+  } catch { return []; }
+}
+
+function saveDraftHistory(userId: string, history: SavedDraft[]) {
+  try {
+    localStorage.setItem(getDraftHistoryKey(userId), JSON.stringify(history));
+  } catch { /* ignore quota errors */ }
+}
+
+// ── AI Refine Actions ────────────────────────────────────────────────────────
+const refineActions = [
+  { label: 'Make Formal', icon: 'business_center', instruction: 'Make the tone more formal and professional. Use industry-standard language.' },
+  { label: 'Simplify', icon: 'lightbulb', instruction: 'Simplify the language. Use shorter sentences, clearer words, and remove jargon.' },
+  { label: 'Expand', icon: 'expand', instruction: 'Expand each section with more detail, examples, and supporting points. Make it more comprehensive.' },
+  { label: 'Shorten', icon: 'compress', instruction: 'Make this more concise. Remove redundancy, tighten prose, keep key points.' },
+  { label: 'Fix Grammar', icon: 'spellcheck', instruction: 'Fix all grammar, spelling, and punctuation errors. Do not change the content or meaning.' },
+];
+
 export function DraftPage() {
+  const { id: userId } = useAppUser();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const isDemo = searchParams.get('demo') === 'true';
@@ -49,12 +85,19 @@ export function DraftPage() {
   const [documentTitle, setDocumentTitle] = useState('');
   const [draft, setDraft] = useState<DraftResponse | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isRefining, setIsRefining] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'preview' | 'edit' | 'raw'>('preview');
   const [showTemplates, setShowTemplates] = useState(true);
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showDocSelector, setShowDocSelector] = useState(false);
+  const [customRefinePrompt, setCustomRefinePrompt] = useState('');
+
+  // Draft history
+  const [draftHistory, setDraftHistory] = useState<SavedDraft[]>(() => loadDraftHistory(userId));
+  const [showHistory, setShowHistory] = useState(false);
+  const [activeDraftId, setActiveDraftId] = useState<string | null>(null);
 
   const docSelectorRef = useRef<HTMLDivElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
@@ -154,6 +197,103 @@ export function DraftPage() {
       setError(err instanceof Error ? err.message : 'Failed to generate draft');
     } finally {
       setIsGenerating(false);
+    }
+  };
+
+  // ── Draft History ──────────────────────────────────────────────────────────
+  const saveDraftToHistory = useCallback((draftToSave: DraftResponse) => {
+    const title = documentTitle || draftToSave.draft.match(/^#\s+(.+)/m)?.[1] || 'Untitled Draft';
+    const now = new Date().toISOString();
+
+    setDraftHistory((prev) => {
+      let updated: SavedDraft[];
+      if (activeDraftId) {
+        // Update existing
+        updated = prev.map((d) =>
+          d.id === activeDraftId
+            ? { ...d, title, draft: draftToSave, updatedAt: now }
+            : d
+        );
+      } else {
+        // Create new
+        const newDraft: SavedDraft = {
+          id: crypto.randomUUID(),
+          title,
+          templateName: selectedTemplate?.name || 'Custom',
+          draft: draftToSave,
+          createdAt: now,
+          updatedAt: now,
+        };
+        setActiveDraftId(newDraft.id);
+        updated = [newDraft, ...prev];
+      }
+      saveDraftHistory(userId, updated);
+      return updated;
+    });
+  }, [activeDraftId, documentTitle, selectedTemplate, userId]);
+
+  // Auto-save after generation completes
+  useEffect(() => {
+    if (draft && draft.draft && !isGenerating && !isRefining) {
+      saveDraftToHistory(draft);
+    }
+  }, [isGenerating, isRefining]);
+
+  const loadDraftFromHistory = (saved: SavedDraft) => {
+    setDraft(saved.draft);
+    setActiveDraftId(saved.id);
+    setDocumentTitle(saved.title);
+    setShowHistory(false);
+    setShowTemplates(false);
+    setActiveTab('preview');
+  };
+
+  const deleteDraftFromHistory = (id: string) => {
+    setDraftHistory((prev) => {
+      const updated = prev.filter((d) => d.id !== id);
+      saveDraftHistory(userId, updated);
+      return updated;
+    });
+    if (activeDraftId === id) {
+      setActiveDraftId(null);
+    }
+  };
+
+  const handleNewDraft = () => {
+    setDraft(null);
+    setActiveDraftId(null);
+    setDocumentTitle('');
+    setInstruction('');
+    setShowTemplates(true);
+    setShowHistory(false);
+  };
+
+  // ── AI Refine ──────────────────────────────────────────────────────────────
+  const handleRefine = async (refineInstruction: string) => {
+    if (!draft || !refineInstruction.trim() || isRefining || isGenerating) return;
+
+    setIsRefining(true);
+    setError(null);
+    setActiveTab('preview');
+
+    try {
+      const previousDraft = draft.draft;
+      setDraft((prev) => prev ? { ...prev, draft: '' } : prev);
+
+      await api.refineDraftStream(
+        previousDraft,
+        refineInstruction,
+        (chunk) => {
+          setDraft((prev) => prev ? { ...prev, draft: prev.draft + chunk } : prev);
+        },
+      );
+      setCustomRefinePrompt('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refine draft');
+      // Restore the previous draft on error
+      setDraft((prev) => prev ? { ...prev, draft: draft.draft } : prev);
+    } finally {
+      setIsRefining(false);
     }
   };
 
@@ -458,7 +598,7 @@ For questions or to proceed, please contact our team.
 
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
-      {/* Toolbar below app shell — demo controls only (title lives in Layout) */}
+      {/* Toolbar */}
       <div className="sticky top-14 z-20 flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 glass-panel px-8 py-2.5">
         <div className="flex items-center gap-3">
           {isDemo ? (
@@ -470,15 +610,125 @@ For questions or to proceed, please contact our team.
               WORKSPACE
             </span>
           )}
+          {!showTemplates && (
+            <button
+              onClick={handleNewDraft}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold text-primary hover:bg-violet-50 rounded-lg transition-colors cursor-pointer"
+            >
+              <span className="material-symbols-outlined text-base">add</span>
+              New
+            </button>
+          )}
         </div>
-        <button
-          type="button"
-          onClick={toggleDemoMode}
-          className="cursor-pointer text-sm font-medium text-primary hover:underline"
-        >
-          {isDemo ? 'Exit Demo' : 'Try Demo'}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setShowHistory(!showHistory)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors cursor-pointer ${
+              showHistory
+                ? 'bg-violet-50 text-primary'
+                : 'text-neutral-500 hover:text-neutral-700 hover:bg-neutral-50'
+            }`}
+          >
+            <span className="material-symbols-outlined text-base">history</span>
+            History
+            {draftHistory.length > 0 && (
+              <span className="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-violet-100 text-violet-600 rounded-full">
+                {draftHistory.length}
+              </span>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={toggleDemoMode}
+            className="cursor-pointer text-sm font-medium text-primary hover:underline"
+          >
+            {isDemo ? 'Exit Demo' : 'Try Demo'}
+          </button>
+        </div>
       </div>
+
+      {/* ── History Sidebar (slide-over) ── */}
+      {showHistory && (
+        <div className="fixed inset-0 z-30 flex justify-end">
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setShowHistory(false)} />
+          <div className="relative w-full max-w-sm bg-white shadow-2xl border-l border-neutral-200 flex flex-col animate-slide-in-left">
+            {/* Header */}
+            <div className="flex items-center justify-between p-5 border-b border-neutral-100">
+              <div className="flex items-center gap-2.5">
+                <span className="material-symbols-outlined text-violet-500">history</span>
+                <h3 className="font-headline font-bold text-neutral-900">Draft History</h3>
+              </div>
+              <button
+                onClick={() => setShowHistory(false)}
+                className="p-1.5 text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 rounded-lg transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            {/* Draft List */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-2">
+              {draftHistory.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center py-12">
+                  <div className="w-14 h-14 rounded-2xl bg-neutral-100 flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined text-2xl text-neutral-300">description</span>
+                  </div>
+                  <p className="text-sm font-medium text-neutral-500">No saved drafts yet</p>
+                  <p className="text-xs text-neutral-400 mt-1">Generated drafts will appear here</p>
+                </div>
+              ) : (
+                draftHistory.map((saved) => (
+                  <div
+                    key={saved.id}
+                    className={`group p-4 rounded-xl border transition-all cursor-pointer ${
+                      activeDraftId === saved.id
+                        ? 'border-violet-200 bg-violet-50/50'
+                        : 'border-neutral-100 bg-white hover:border-neutral-200 hover:shadow-sm'
+                    }`}
+                    onClick={() => loadDraftFromHistory(saved)}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm text-neutral-900 truncate">{saved.title}</p>
+                        <p className="text-xs text-neutral-400 mt-0.5">{saved.templateName}</p>
+                        <p className="text-[11px] text-neutral-400 mt-1.5">
+                          {new Date(saved.updatedAt).toLocaleDateString(undefined, {
+                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
+                          })}
+                        </p>
+                      </div>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); deleteDraftFromHistory(saved.id); }}
+                        className="opacity-0 group-hover:opacity-100 p-1 text-neutral-300 hover:text-red-500 transition-all cursor-pointer"
+                        title="Delete draft"
+                      >
+                        <span className="material-symbols-outlined text-base">delete</span>
+                      </button>
+                    </div>
+                    <p className="text-xs text-neutral-500 mt-2 line-clamp-2">
+                      {saved.draft.draft.replace(/[#*_`>|\-\[\]]/g, '').slice(0, 120)}...
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Footer */}
+            {draftHistory.length > 0 && (
+              <div className="p-4 border-t border-neutral-100">
+                <button
+                  onClick={handleNewDraft}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 primary-gradient text-white text-sm font-bold rounded-xl shadow-lg shadow-violet-500/15 hover:shadow-xl transition-all cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base">add</span>
+                  New Draft
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Template Selection View */}
       {showTemplates ? (
@@ -853,9 +1103,60 @@ For questions or to proceed, please contact our team.
                   </div>
                 )}
 
+                {/* AI Refine Toolbar */}
+                {draft && !isGenerating && (
+                  <div className="px-4 py-2.5 border-b border-neutral-100 bg-gradient-to-r from-violet-50/50 to-white flex-shrink-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="material-symbols-outlined text-sm text-violet-400">auto_awesome</span>
+                      <span className="text-[11px] font-bold text-violet-500 uppercase tracking-wider mr-1">AI Refine</span>
+                      {refineActions.map((action) => (
+                        <button
+                          key={action.label}
+                          onClick={() => handleRefine(action.instruction)}
+                          disabled={isRefining}
+                          className="px-3 py-1 text-xs font-semibold text-neutral-600 bg-white border border-neutral-200 rounded-lg hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">{action.icon}</span>
+                          {action.label}
+                        </button>
+                      ))}
+                      <div className="flex-1 flex items-center gap-2 ml-2">
+                        <input
+                          type="text"
+                          value={customRefinePrompt}
+                          onChange={(e) => setCustomRefinePrompt(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && customRefinePrompt.trim()) {
+                              handleRefine(customRefinePrompt.trim());
+                            }
+                          }}
+                          placeholder="Custom instruction..."
+                          disabled={isRefining}
+                          className="flex-1 min-w-[140px] px-3 py-1 text-xs bg-white border border-neutral-200 rounded-lg focus:ring-1 focus:ring-violet-300 focus:border-violet-300 outline-none placeholder:text-neutral-300 disabled:opacity-40"
+                        />
+                        {customRefinePrompt.trim() && (
+                          <button
+                            onClick={() => handleRefine(customRefinePrompt.trim())}
+                            disabled={isRefining}
+                            className="p-1 text-violet-500 hover:text-violet-700 transition-colors cursor-pointer disabled:opacity-40"
+                          >
+                            <span className="material-symbols-outlined text-base">send</span>
+                          </button>
+                        )}
+                      </div>
+                      {isRefining && (
+                        <span className="text-xs text-violet-500 font-medium flex items-center gap-1.5 ml-2">
+                          <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-pulse" />
+                          Refining...
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {/* Preview Content */}
                 <div className="flex-1 overflow-y-auto relative">
-                  {isGenerating && !draft?.draft ? (
+                  {(isGenerating || isRefining) && !draft?.draft ? (
                     <>
                       {/* Skeleton — only shown before first token arrives */}
                       <div className="p-10 space-y-6">
@@ -897,7 +1198,7 @@ For questions or to proceed, please contact our team.
                   ) : draft ? (
                     activeTab === 'preview' ? (
                       <div className="p-10">
-                        <StreamingMarkdown text={draft.draft} variant="draft" isStreaming={isGenerating} />
+                        <StreamingMarkdown text={draft.draft} variant="draft" isStreaming={isGenerating || isRefining} />
                       </div>
                     ) : activeTab === 'edit' ? (
                       <div className="flex flex-col h-full">

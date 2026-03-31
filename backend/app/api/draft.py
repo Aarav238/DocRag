@@ -10,7 +10,7 @@ from app.core.config import get_settings
 from app.core.database import get_db
 from app.services.embedding import get_embedding
 from app.services.vector_store import VectorStore
-from app.services.llm import generate_draft, generate_draft_stream, parse_markdown_sections
+from app.services.llm import generate_draft, generate_draft_stream, refine_draft_stream, parse_markdown_sections
 from app.services.user_documents import require_docs_owned_by_user
 
 router = APIRouter()
@@ -177,3 +177,26 @@ async def generate_document_draft_stream(
         yield "event: done\ndata: {}\n\n"
 
     return StreamingResponse(stream_draft(), media_type="text/event-stream")
+
+
+class RefineRequest(BaseModel):
+    draft: str
+    instruction: str
+
+
+@router.post("/refine/stream")
+async def refine_document_draft_stream(
+    refine_request: RefineRequest,
+    user: UserContext = Depends(get_current_user),
+):
+    """Refine an existing draft with an AI editing instruction, streamed via SSE."""
+
+    async def stream_refine():
+        async for token in refine_draft_stream(
+            current_draft=refine_request.draft,
+            instruction=refine_request.instruction,
+        ):
+            yield f"event: chunk\ndata: {json.dumps({'text': token})}\n\n"
+        yield "event: done\ndata: {}\n\n"
+
+    return StreamingResponse(stream_refine(), media_type="text/event-stream")

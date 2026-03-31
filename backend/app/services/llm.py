@@ -353,6 +353,46 @@ Generate the complete document now:""",
             yield delta.content
 
 
+REFINE_SYSTEM_PROMPT = """You are a professional document editor. The user will give you an existing draft and an editing instruction. Apply ONLY the requested change — preserve everything else (structure, content, formatting, tone) unless the instruction explicitly asks you to change it.
+
+Return the complete revised document in markdown. Do not add commentary or explanations — output only the revised document."""
+
+
+async def refine_draft_stream(
+    current_draft: str,
+    instruction: str,
+) -> AsyncGenerator[str, None]:
+    """Stream a refined version of the draft based on the editing instruction."""
+    messages = [
+        {"role": "system", "content": REFINE_SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": f"""Here is the current draft:
+
+{current_draft}
+
+---
+
+Editing instruction: {instruction}
+
+Apply this change and return the complete revised document:""",
+        },
+    ]
+
+    stream = await client.chat.completions.create(
+        model=settings.openai_chat_model,
+        messages=messages,
+        temperature=0.3,
+        max_tokens=4000,
+        stream=True,
+    )
+
+    async for chunk in stream:
+        delta = chunk.choices[0].delta
+        if delta.content:
+            yield delta.content
+
+
 def parse_markdown_sections(markdown: str) -> List[Dict]:
     """Parse markdown into sections based on ## headers."""
     sections = []

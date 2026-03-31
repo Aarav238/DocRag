@@ -176,6 +176,23 @@ export const api = {
     }
     await readSSEStream(response, { onChunk, onMetadata });
   },
+
+  async refineDraftStream(
+    draft: string,
+    instruction: string,
+    onChunk: (text: string) => void,
+  ): Promise<void> {
+    const response = await authFetch(`${API_BASE}/draft/refine/stream`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ draft, instruction }),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
+      throw new Error(error.detail || 'An error occurred');
+    }
+    await readSSEStream(response, { onChunk });
+  },
 };
 
 interface SSECallbacks {
