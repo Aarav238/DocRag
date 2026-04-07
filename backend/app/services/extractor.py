@@ -1,3 +1,4 @@
+import asyncio
 import pdfplumber
 from docx import Document as DocxDocument
 from pathlib import Path
@@ -15,26 +16,26 @@ class TextExtractor:
     async def extract(file_path: str, file_type: str) -> List[Dict]:
         """
         Extract text from a document.
+        Runs blocking I/O in a thread pool to avoid blocking the event loop.
 
         Returns:
             List of dicts with 'page_number' and 'text' keys.
         """
         if file_type == "pdf":
-            return await TextExtractor._extract_pdf(file_path)
+            return await asyncio.to_thread(TextExtractor._extract_pdf_sync, file_path)
         elif file_type == "docx":
-            return await TextExtractor._extract_docx(file_path)
+            return await asyncio.to_thread(TextExtractor._extract_docx_sync, file_path)
         else:
             raise ValueError(f"Unsupported file type: {file_type}")
 
     @staticmethod
-    async def _extract_pdf(file_path: str) -> List[Dict]:
-        """Extract text from PDF using pdfplumber."""
+    def _extract_pdf_sync(file_path: str) -> List[Dict]:
+        """Extract text from PDF using pdfplumber (blocking I/O, run in thread)."""
         pages = []
         try:
             with pdfplumber.open(file_path) as pdf:
                 for i, page in enumerate(pdf.pages):
                     text = page.extract_text() or ""
-                    # Clean extracted text
                     text = TextExtractor._clean_text(text)
                     if text.strip():
                         pages.append({
@@ -48,8 +49,8 @@ class TextExtractor:
         return pages
 
     @staticmethod
-    async def _extract_docx(file_path: str) -> List[Dict]:
-        """Extract text from DOCX using python-docx."""
+    def _extract_docx_sync(file_path: str) -> List[Dict]:
+        """Extract text from DOCX using python-docx (blocking I/O, run in thread)."""
         try:
             doc = DocxDocument(file_path)
             full_text = []

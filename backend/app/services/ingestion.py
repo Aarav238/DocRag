@@ -1,6 +1,7 @@
 import logging
 import os
 import tempfile
+import time
 import uuid
 import httpx
 from datetime import datetime
@@ -15,20 +16,21 @@ logger = logging.getLogger(__name__)
 
 
 async def download_file_from_url(url: str, file_ext: str) -> str:
-    """Download a file from URL to a temporary location."""
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, follow_redirects=True)
-        response.raise_for_status()
+    """Download a file from URL to a temporary location using streaming."""
+    async with httpx.AsyncClient(timeout=120.0) as client:
+        async with client.stream("GET", url, follow_redirects=True) as response:
+            response.raise_for_status()
 
-        fd, temp_path = tempfile.mkstemp(suffix=f".{file_ext}")
-        try:
-            with os.fdopen(fd, 'wb') as f:
-                f.write(response.content)
-        except Exception:
-            os.close(fd)
-            raise
+            fd, temp_path = tempfile.mkstemp(suffix=f".{file_ext}")
+            try:
+                with os.fdopen(fd, 'wb') as f:
+                    async for chunk in response.aiter_bytes(chunk_size=65536):
+                        f.write(chunk)
+            except Exception:
+                os.close(fd)
+                raise
 
-        return temp_path
+            return temp_path
 
 
 async def update_status(db, doc_id: str, status: DocumentStatus):
@@ -59,15 +61,20 @@ async def process_document(doc_id: str):
 
         logger.info(f"Processing document: {doc['file_name']}")
 
+        pipeline_start = time.perf_counter()
+
         # Determine file path - download from URL if needed
         if doc.get("file_url"):
+            t0 = time.perf_counter()
             logger.info(f"Downloading file from UploadThing: {doc['file_url']}")
             temp_file_path = await download_file_from_url(doc["file_url"], doc["file_type"])
             file_path = temp_file_path
+            logger.info(f"[TIMING] Download: {time.perf_counter() - t0:.2f}s")
         else:
             file_path = doc.get("file_path")
 
         # Step 1: Extract text
+        t0 = time.perf_counter()
         await update_status(db, doc_id, DocumentStatus.EXTRACTING)
         extractor = TextExtractor()
         pages = await extractor.extract(file_path, doc["file_type"])
@@ -87,9 +94,10 @@ async def process_document(doc_id: str):
             for page_data in pages
         ]
         await db.document_pages.insert_many(page_docs)
-        logger.info(f"Extracted {len(pages)} pages from {doc['file_name']}")
+        logger.info(f"[TIMING] Extraction: {time.perf_counter() - t0:.2f}s — {len(pages)} pages from {doc['file_name']}")
 
         # Step 2: Chunk text
+        t0 = time.perf_counter()
         await update_status(db, doc_id, DocumentStatus.CHUNKING)
         chunker = TextChunker()
         chunks = chunker.chunk_pages(pages)
@@ -113,15 +121,17 @@ async def process_document(doc_id: str):
             for i, chunk_data in enumerate(chunks)
         ]
         await db.chunks.insert_many(chunk_docs)
-        logger.info(f"Created {len(chunks)} chunks from {doc['file_name']}")
+        logger.info(f"[TIMING] Chunking: {time.perf_counter() - t0:.2f}s — {len(chunks)} chunks from {doc['file_name']}")
 
         # Step 3: Generate embeddings
+        t0 = time.perf_counter()
         await update_status(db, doc_id, DocumentStatus.EMBEDDING)
         texts = [c["text"] for c in chunk_docs]
         embeddings = await get_embeddings_batch(texts)
-        logger.info(f"Generated {len(embeddings)} embeddings for {doc['file_name']}")
+        logger.info(f"[TIMING] Embedding: {time.perf_counter() - t0:.2f}s — {len(embeddings)} embeddings for {doc['file_name']}")
 
         # Step 4: Store in vector DB
+        t0 = time.perf_counter()
         from app.main import app
         from app.services.vector_store import VectorStore
         vector_store: VectorStore = app.state.vector_store
@@ -141,7 +151,9 @@ async def process_document(doc_id: str):
         await vector_store.add_vectors(embeddings, metadata_list)
 
         await update_status(db, doc_id, DocumentStatus.INDEXED)
-        logger.info(f"Successfully indexed document: {doc['file_name']}")
+        total_time = time.perf_counter() - pipeline_start
+        logger.info(f"[TIMING] Pinecone upsert: {time.perf_counter() - t0:.2f}s")
+        logger.info(f"[TIMING] TOTAL pipeline for {doc['file_name']}: {total_time:.2f}s")
 
     except Exception as e:
         logger.error(f"Error processing document {doc_id}: {e}")
