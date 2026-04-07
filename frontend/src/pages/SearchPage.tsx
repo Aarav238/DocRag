@@ -1,17 +1,19 @@
 import { useState, useEffect } from 'react';
 import { api } from '../api/client';
+import { DocumentListSkeleton } from '../components/DocumentListSkeleton';
 import type { Document, SearchResult } from '../api/types';
 
 export function SearchPage() {
   const [query, setQuery] = useState('');
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(true);
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    api.listDocuments('indexed').then(({ documents }) => setDocuments(documents));
+    api.listDocuments('indexed').then(({ documents }) => setDocuments(documents)).finally(() => setIsLoadingDocs(false));
   }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -104,7 +106,9 @@ export function SearchPage() {
               Select documents to narrow results, or leave all unchecked to search everything.
             </p>
 
-            {documents.length > 0 ? (
+            {isLoadingDocs ? (
+              <DocumentListSkeleton count={3} compact />
+            ) : documents.length > 0 ? (
               <div className="space-y-1.5 max-h-[60vh] overflow-y-auto pr-1">
                 {documents.map((doc) => (
                   <label

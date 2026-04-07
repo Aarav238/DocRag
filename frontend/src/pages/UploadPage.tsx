@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { FileUpload } from '../components/FileUpload';
 import { DocumentList } from '../components/DocumentList';
+import { DocumentListSkeleton } from '../components/DocumentListSkeleton';
 import { api } from '../api/client';
 import type { Document } from '../api/types';
 
@@ -8,6 +9,7 @@ const PROCESSING_STATUSES = ['uploaded', 'extracting', 'chunking', 'embedding'];
 
 export function UploadPage() {
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadingFileName, setUploadingFileName] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +24,8 @@ export function UploadPage() {
     } catch (err) {
       console.error('Failed to fetch documents:', err);
       return [];
+    } finally {
+      setIsLoadingDocs(false);
     }
   }, []);
 
@@ -132,7 +136,11 @@ export function UploadPage() {
               <span className="text-sm font-medium text-neutral-400">{documents.length} total</span>
             )}
           </div>
-          <DocumentList documents={documents} onDelete={handleDelete} />
+          {isLoadingDocs ? (
+            <DocumentListSkeleton count={3} />
+          ) : (
+            <DocumentList documents={documents} onDelete={handleDelete} />
+          )}
         </div>
       </div>
     </div>

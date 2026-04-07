@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '../api/client';
 import { DocumentList } from '../components/DocumentList';
+import { DocumentListSkeleton } from '../components/DocumentListSkeleton';
 import { StreamingMarkdown } from '../components/StreamingMarkdown';
 import { useAppUser } from '../contexts/UserContext';
 import type { Document, QAResponse } from '../api/types';
@@ -38,6 +39,7 @@ const saveMessages = (userId: string, messages: Message[]) => {
 export function ChatPage() {
   const { id: userId } = useAppUser();
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(true);
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [messages, setMessages] = useState<Message[]>(() => loadStoredMessages(userId));
   const [input, setInput] = useState('');
@@ -48,7 +50,7 @@ export function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    api.listDocuments('indexed').then(({ documents }) => setDocuments(documents));
+    api.listDocuments('indexed').then(({ documents }) => setDocuments(documents)).finally(() => setIsLoadingDocs(false));
   }, []);
 
   // Clean up old unscoped key from before this fix
@@ -180,7 +182,9 @@ export function ChatPage() {
 
         {/* Document List */}
         <div className="flex-1 overflow-y-auto p-3">
-          {documents.length === 0 ? (
+          {isLoadingDocs ? (
+            <DocumentListSkeleton count={4} compact />
+          ) : documents.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center py-8">
               <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center mb-3">
                 <span className="material-symbols-outlined text-neutral-400 text-2xl">description</span>

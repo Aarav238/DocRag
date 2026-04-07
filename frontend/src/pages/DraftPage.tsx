@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { api } from '../api/client';
 import { DocumentList } from '../components/DocumentList';
+import { DocumentListSkeleton } from '../components/DocumentListSkeleton';
 import { StreamingMarkdown } from '../components/StreamingMarkdown';
 import { useAppUser } from '../contexts/UserContext';
 import { templates, type DocumentTemplate } from '../lib/templates';
@@ -77,6 +78,7 @@ export function DraftPage() {
   };
 
   const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(true);
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<DocumentTemplate | null>(null);
   const [instruction, setInstruction] = useState('');
@@ -119,8 +121,9 @@ export function DraftPage() {
     if (isDemo) {
       setDocuments(mockDemoDocuments);
       setSelectedDocIds(mockDemoDocuments.map((d) => d.doc_id));
+      setIsLoadingDocs(false);
     } else {
-      api.listDocuments('indexed').then(({ documents }) => setDocuments(documents));
+      api.listDocuments('indexed').then(({ documents }) => setDocuments(documents)).finally(() => setIsLoadingDocs(false));
     }
   }, [isDemo]);
 
@@ -907,13 +910,17 @@ For questions or to proceed, please contact our team.
 
                     {showDocSelector && (
                       <div className="absolute z-20 left-0 right-0 mt-1 bg-white rounded-xl shadow-xl border border-neutral-200/60 max-h-60 overflow-y-auto p-3">
-                        <DocumentList
-                          documents={documents}
-                          selectable
-                          selectedIds={selectedDocIds}
-                          onSelectionChange={setSelectedDocIds}
-                          compact
-                        />
+                        {isLoadingDocs ? (
+                          <DocumentListSkeleton count={3} compact />
+                        ) : (
+                          <DocumentList
+                            documents={documents}
+                            selectable
+                            selectedIds={selectedDocIds}
+                            onSelectionChange={setSelectedDocIds}
+                            compact
+                          />
+                        )}
                       </div>
                     )}
                   </div>

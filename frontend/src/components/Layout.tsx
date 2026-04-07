@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { UserButton } from '@clerk/clerk-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { UserButton, useClerk } from '@clerk/clerk-react';
 import { api } from '../api/client';
 
 interface LayoutProps {
@@ -35,9 +35,13 @@ function usePageTitle(pathname: string): string {
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { openUserProfile, signOut } = useClerk();
   const pageTitle = usePageTitle(location.pathname);
   const [indexedCount, setIndexedCount] = useState(0);
   const [processingCount, setProcessingCount] = useState(0);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const settingsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -59,6 +63,24 @@ export function Layout({ children }: LayoutProps) {
     return () => {
       cancelled = true;
     };
+  }, [location.pathname]);
+
+  // Close settings dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setSettingsOpen(false);
+      }
+    }
+    if (settingsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [settingsOpen]);
+
+  // Close dropdown on route change
+  useEffect(() => {
+    setSettingsOpen(false);
   }, [location.pathname]);
 
   return (
@@ -169,20 +191,85 @@ export function Layout({ children }: LayoutProps) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              className="rounded-xl p-2.5 text-neutral-400 transition-all hover:bg-neutral-100 hover:text-neutral-600 active:scale-95"
-              aria-label="Notifications"
-            >
-              <span className="material-symbols-outlined text-[20px] leading-none">notifications</span>
-            </button>
-            <Link
-              to="/guide"
-              className="rounded-xl p-2.5 text-neutral-400 transition-all hover:bg-neutral-100 hover:text-neutral-600 active:scale-95"
-              aria-label="Help and settings"
-            >
-              <span className="material-symbols-outlined text-[20px] leading-none">settings</span>
-            </Link>
+            {/* Settings dropdown */}
+            <div className="relative" ref={settingsRef}>
+              <button
+                type="button"
+                onClick={() => setSettingsOpen((v) => !v)}
+                className={`rounded-xl p-2.5 transition-all active:scale-95 cursor-pointer ${
+                  settingsOpen
+                    ? 'bg-violet-50 text-violet-600'
+                    : 'text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600'
+                }`}
+                aria-label="Settings"
+                aria-expanded={settingsOpen}
+              >
+                <span
+                  className={`material-symbols-outlined text-[20px] leading-none transition-transform duration-300 block ${
+                    settingsOpen ? 'rotate-90' : ''
+                  }`}
+                >
+                  settings
+                </span>
+              </button>
+
+              {settingsOpen && (
+                <div className="absolute right-0 top-full mt-2 w-56 origin-top-right rounded-xl border border-neutral-200/60 bg-white shadow-xl shadow-neutral-200/50 animate-scale-in z-50">
+                  <div className="p-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSettingsOpen(false);
+                        navigate('/upload');
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-violet-50 hover:text-violet-700 cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px] text-neutral-400">upload_file</span>
+                      Add Document
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSettingsOpen(false);
+                        navigate('/upload');
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-violet-50 hover:text-violet-700 cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px] text-neutral-400">folder_open</span>
+                      Manage Documents
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSettingsOpen(false);
+                        openUserProfile();
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-violet-50 hover:text-violet-700 cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px] text-neutral-400">person</span>
+                      Account Settings
+                    </button>
+                  </div>
+
+                  <div className="mx-3 border-t border-neutral-100" />
+
+                  <div className="p-1.5">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSettingsOpen(false);
+                        signOut({ redirectUrl: '/' });
+                      }}
+                      className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 cursor-pointer"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">logout</span>
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="ml-1 sm:ml-2">
               <UserButton
                 afterSignOutUrl="/"
