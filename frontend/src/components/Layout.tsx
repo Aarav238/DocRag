@@ -41,6 +41,7 @@ export function Layout({ children }: LayoutProps) {
   const [indexedCount, setIndexedCount] = useState(0);
   const [processingCount, setProcessingCount] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const settingsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -78,17 +79,30 @@ export function Layout({ children }: LayoutProps) {
     }
   }, [settingsOpen]);
 
-  // Close dropdown on route change
+  // Close dropdown & mobile nav on route change
   useEffect(() => {
     setSettingsOpen(false);
+    setMobileNavOpen(false);
   }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-background text-on-surface flex">
-      {/* ── Light Sidebar ── */}
-      <aside className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-neutral-200/70 bg-white py-6">
+      {/* ── Mobile sidebar backdrop ── */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm lg:hidden animate-fade-in"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
+      {/* ── Sidebar ── */}
+      <aside
+        className={`fixed left-0 top-0 z-50 flex h-screen w-[260px] flex-col border-r border-neutral-200/70 bg-white py-6 transition-transform duration-300 ease-out lg:translate-x-0 ${
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
         {/* Logo */}
-        <div className="mb-8 px-6 animate-fade-in">
+        <div className="mb-8 px-6 animate-fade-in flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3 group">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl primary-gradient shadow-lg shadow-violet-500/20 transition-transform group-hover:scale-105">
               <span className="text-white text-base font-black font-headline">D</span>
@@ -98,6 +112,15 @@ export function Layout({ children }: LayoutProps) {
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-violet-500">Intelligence</p>
             </div>
           </Link>
+          {/* Close button — mobile only */}
+          <button
+            type="button"
+            onClick={() => setMobileNavOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors cursor-pointer"
+            aria-label="Close menu"
+          >
+            <span className="material-symbols-outlined text-xl">close</span>
+          </button>
         </div>
 
         {/* Navigation */}
@@ -167,14 +190,24 @@ export function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* ── Main Content ── */}
-      <div className="ml-[260px] flex min-h-screen flex-1 flex-col">
+      <div className="lg:ml-[260px] flex min-h-screen flex-1 flex-col">
         {/* Top bar */}
-        <header className="sticky top-0 z-50 flex w-full flex-wrap items-center justify-between gap-3 border-b border-neutral-200/60 glass-panel px-8 py-3.5">
-          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-4 sm:gap-6">
-            <h2 className="font-headline text-xl font-extrabold tracking-tight text-neutral-900 truncate">
+        <header className="sticky top-0 z-30 flex w-full flex-wrap items-center justify-between gap-3 border-b border-neutral-200/60 glass-panel px-4 sm:px-6 lg:px-8 py-3.5">
+          <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 sm:gap-4 lg:gap-6">
+            {/* Hamburger — mobile only */}
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="lg:hidden p-2 -ml-1 rounded-xl text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 transition-colors cursor-pointer"
+              aria-label="Open menu"
+            >
+              <span className="material-symbols-outlined text-2xl leading-none">menu</span>
+            </button>
+
+            <h2 className="font-headline text-lg sm:text-xl font-extrabold tracking-tight text-neutral-900 truncate">
               {pageTitle}
             </h2>
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="hidden sm:flex flex-wrap items-center gap-2 sm:gap-3">
               {indexedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200/60 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />

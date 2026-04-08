@@ -103,22 +103,22 @@ export function LandingPage() {
         <div className="absolute -top-60 right-0 w-[700px] h-[700px] rounded-full bg-violet-200/30 blur-[120px] pointer-events-none" />
         <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-cyan-200/25 blur-[100px] pointer-events-none" />
 
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
           {/* Badge */}
-          <div className="animate-fade-in-up delay-0 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-violet-50 text-violet-700 text-xs font-bold tracking-widest uppercase mb-8 border border-violet-200/60">
+          <div className="animate-fade-in-up delay-0 inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-violet-50 text-violet-700 text-[10px] sm:text-xs font-bold tracking-widest uppercase mb-6 sm:mb-8 border border-violet-200/60">
             <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
             Retrieval-Augmented Intelligence
           </div>
 
           {/* Headline */}
-          <h1 className="animate-fade-in-up delay-1 font-headline text-5xl sm:text-6xl lg:text-[5rem] font-black tracking-tight text-neutral-900 leading-[1.05] mb-6">
+          <h1 className="animate-fade-in-up delay-1 font-headline text-3xl sm:text-5xl md:text-6xl lg:text-[5rem] font-black tracking-tight text-neutral-900 leading-[1.08] mb-6">
             Document Intelligence
             <br />
             <span className="text-gradient">That Actually Works</span>
           </h1>
 
           {/* Subheading */}
-          <p className="animate-fade-in-up delay-2 mx-auto max-w-2xl text-lg text-neutral-500 leading-relaxed mb-12">
+          <p className="animate-fade-in-up delay-2 mx-auto max-w-2xl text-base sm:text-lg text-neutral-500 leading-relaxed mb-8 sm:mb-12">
             Upload any corpus, ask complex questions, and receive accurate, cited
             answers in seconds — powered by retrieval-augmented generation and
             high-dimensional vector search.
@@ -176,10 +176,10 @@ export function LandingPage() {
             {stats.map((stat, i) => (
               <div
                 key={stat.label}
-                className="animate-fade-in-up bg-white rounded-2xl p-8 flex flex-col justify-end border border-neutral-100 shadow-sm card-hover"
+                className="animate-fade-in-up bg-white rounded-2xl p-5 sm:p-8 flex flex-col justify-end border border-neutral-100 shadow-sm card-hover"
                 style={{ animationDelay: `${i * 100 + 200}ms` }}
               >
-                <span className={`font-headline text-4xl lg:text-5xl font-black ${stat.color}`}>
+                <span className={`font-headline text-2xl sm:text-4xl lg:text-5xl font-black ${stat.color}`}>
                   {stat.value}
                 </span>
                 <span className="mt-2 text-sm font-medium text-neutral-400">{stat.label}</span>
@@ -194,9 +194,9 @@ export function LandingPage() {
         <div className="absolute inset-0 bg-neutral-50/80" />
         <div className="absolute inset-0 dot-grid opacity-30" />
 
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="font-headline text-3xl sm:text-4xl font-black text-neutral-900 mb-4 tracking-tight">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="font-headline text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 mb-4 tracking-tight">
               Everything You Need
             </h2>
             <p className="text-neutral-500 text-lg max-w-2xl mx-auto">
@@ -272,7 +272,7 @@ export function LandingPage() {
             </div>
 
             {/* App screen mockup */}
-            <div className="rounded-2xl border border-neutral-200 bg-white shadow-2xl shadow-neutral-200/50 overflow-hidden">
+            <div className="hidden sm:block rounded-2xl border border-neutral-200 bg-white shadow-2xl shadow-neutral-200/50 overflow-hidden">
               {/* Browser chrome */}
               <div className="flex items-center gap-2 px-4 py-2.5 bg-neutral-50 border-b border-neutral-200">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-400" />
@@ -372,8 +372,8 @@ export function LandingPage() {
         <div className="absolute inset-0 bg-neutral-50/80" />
         <div className="absolute inset-0 dot-grid opacity-30" />
 
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8 text-center">
-          <h2 className="font-headline text-3xl sm:text-4xl font-black text-neutral-900 mb-4 tracking-tight">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="font-headline text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 mb-4 tracking-tight">
             Built for Every Knowledge Worker
           </h2>
           <p className="text-neutral-500 text-lg max-w-2xl mx-auto mb-14">
@@ -401,10 +401,10 @@ export function LandingPage() {
       <section className="py-24 bg-sidebar text-white relative overflow-hidden noise-overlay">
         <div className="absolute inset-0 dot-grid-dark" />
 
-        <div className="relative mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
             <div>
-              <h2 className="font-headline text-3xl sm:text-4xl font-black mb-6 tracking-tight">
+              <h2 className="font-headline text-2xl sm:text-3xl lg:text-4xl font-black mb-6 tracking-tight">
                 Powered by Retrieval-Augmented Generation
               </h2>
               <p className="text-slate-400 text-lg mb-8 leading-relaxed">
@@ -425,7 +425,7 @@ export function LandingPage() {
               </ul>
             </div>
 
-            <div className="bg-slate-800/50 rounded-2xl p-8 font-mono text-sm leading-relaxed overflow-x-auto border border-slate-700/50 backdrop-blur-sm">
+            <div className="bg-slate-800/50 rounded-2xl p-4 sm:p-8 font-mono text-xs sm:text-sm leading-relaxed overflow-x-auto border border-slate-700/50 backdrop-blur-sm">
               <div className="flex items-center gap-2 mb-6 text-slate-500">
                 <span className="w-3 h-3 rounded-full bg-red-400/60" />
                 <span className="w-3 h-3 rounded-full bg-amber-400/60" />
@@ -459,8 +459,8 @@ answer = llm.chat(
         <div className="absolute inset-0 dot-grid opacity-20" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-violet-100/40 blur-[100px] pointer-events-none" />
 
-        <div className="relative mx-auto max-w-4xl px-6 lg:px-8 text-center">
-          <h2 className="font-headline text-3xl sm:text-4xl font-black text-neutral-900 mb-4 tracking-tight">
+        <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="font-headline text-2xl sm:text-3xl lg:text-4xl font-black text-neutral-900 mb-4 tracking-tight">
             Ready to Analyze Your Documents?
           </h2>
           <p className="text-neutral-500 text-lg mb-10 max-w-2xl mx-auto">
@@ -499,8 +499,8 @@ answer = llm.chat(
 
       {/* ═══════════ Footer ═══════════ */}
       <footer className="bg-neutral-50 border-t border-neutral-200/60 py-16">
-        <div className="mx-auto max-w-7xl px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10">
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-center gap-2.5 mb-4">
                 <div className="w-8 h-8 rounded-lg primary-gradient flex items-center justify-center shadow-sm">

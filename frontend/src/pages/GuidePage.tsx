@@ -101,14 +101,14 @@ export function GuidePage() {
     <div className="flex flex-col min-h-screen bg-white">
       <MarketingHeader showTryDemo={false} />
 
-      <div className="mx-auto w-full max-w-5xl space-y-16 px-8 pb-8 pt-28 lg:px-12 lg:pb-12">
+      <div className="mx-auto w-full max-w-5xl space-y-10 sm:space-y-16 px-4 sm:px-8 pb-6 sm:pb-8 pt-24 sm:pt-28 lg:px-12 lg:pb-12">
         {/* Hero */}
         <section className="space-y-6 animate-fade-in-up">
           <span className="inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-1.5 text-sm font-bold text-violet-700 border border-violet-200/60">
             <span className="h-2 w-2 rounded-full bg-cyan-500 animate-pulse" />
             v2.0 — Intelligence Upgrade
           </span>
-          <h1 className="text-5xl lg:text-6xl font-black font-headline tracking-tight text-neutral-900 leading-tight">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black font-headline tracking-tight text-neutral-900 leading-tight">
             Getting Started with{' '}
             <span className="text-gradient">DocRAG</span>
           </h1>
@@ -173,7 +173,7 @@ export function GuidePage() {
         </section>
 
         {/* Technical Pipeline */}
-        <section className="relative overflow-hidden rounded-2xl border border-neutral-200/60 bg-gradient-to-br from-neutral-50 via-white to-violet-50/30 p-6 shadow-sm sm:p-8 lg:p-10">
+        <section className="relative overflow-hidden rounded-2xl border border-neutral-200/60 bg-gradient-to-br from-neutral-50 via-white to-violet-50/30 p-4 shadow-sm sm:p-8 lg:p-10">
           <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-violet-200/20 blur-[80px]" />
           <div className="pointer-events-none absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-cyan-200/15 blur-[80px]" />
 
@@ -336,7 +336,7 @@ export function GuidePage() {
         </section>
 
         {/* CTA */}
-        <section className="rounded-2xl p-10 lg:p-14 text-center space-y-6 relative overflow-hidden bg-gradient-to-br from-violet-50 via-white to-cyan-50 border border-violet-200/50">
+        <section className="rounded-2xl p-6 sm:p-10 lg:p-14 text-center space-y-6 relative overflow-hidden bg-gradient-to-br from-violet-50 via-white to-cyan-50 border border-violet-200/50">
           <div className="absolute inset-0 dot-grid opacity-30" />
           <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-violet-200/30 blur-[80px] pointer-events-none" />
           <div className="absolute -bottom-20 -left-20 w-56 h-56 rounded-full bg-cyan-200/20 blur-[80px] pointer-events-none" />

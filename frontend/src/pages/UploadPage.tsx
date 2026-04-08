@@ -95,7 +95,7 @@ export function UploadPage() {
 
   return (
     <div className="flex flex-col min-h-full animate-fade-in">
-      <div className="mx-auto w-full max-w-6xl space-y-8 p-8">
+      <div className="mx-auto w-full max-w-6xl space-y-6 sm:space-y-8 p-4 sm:p-6 lg:p-8">
         {/* Success Message */}
         {successMessage && (
           <div className="border border-emerald-200 bg-emerald-50 px-5 py-4 rounded-xl flex items-center gap-3 animate-scale-in">

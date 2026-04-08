@@ -602,7 +602,7 @@ For questions or to proceed, please contact our team.
   return (
     <div className="flex flex-col min-h-screen animate-fade-in">
       {/* Toolbar */}
-      <div className="sticky top-14 z-20 flex flex-wrap items-center justify-between gap-3 border-b border-neutral-100 glass-panel px-8 py-2.5">
+      <div className="sticky top-14 z-20 flex flex-wrap items-center justify-between gap-2 sm:gap-3 border-b border-neutral-100 glass-panel px-4 sm:px-6 lg:px-8 py-2.5">
         <div className="flex items-center gap-3">
           {isDemo ? (
             <span className="rounded-full border border-amber-100 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">
@@ -735,12 +735,12 @@ For questions or to proceed, please contact our team.
 
       {/* Template Selection View */}
       {showTemplates ? (
-        <div className="flex-1 p-8 overflow-y-auto">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
           {/* Demo Banner */}
           {isDemo && (
-            <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 flex items-center justify-between">
+            <div className="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
                   <span className="material-symbols-outlined text-amber-600" style={{ fontSize: '24px' }}>
                     auto_awesome
                   </span>
@@ -754,7 +754,7 @@ For questions or to proceed, please contact our team.
               </div>
               <Link
                 to="/upload"
-                className="px-5 py-2.5 primary-gradient text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer"
+                className="px-5 py-2.5 primary-gradient text-white text-sm font-bold rounded-xl shadow-lg hover:shadow-xl transition-all cursor-pointer whitespace-nowrap shrink-0"
               >
                 Upload Real Documents
               </Link>
@@ -770,8 +770,8 @@ For questions or to proceed, please contact our team.
             </div>
           )}
 
-          <div className="bg-white rounded-2xl border border-neutral-200/60 shadow-sm p-8">
-            <h2 className="font-headline text-lg font-extrabold text-neutral-900 mb-6">Choose a Template</h2>
+          <div className="bg-white rounded-2xl border border-neutral-200/60 shadow-sm p-4 sm:p-6 lg:p-8">
+            <h2 className="font-headline text-lg font-extrabold text-neutral-900 mb-4 sm:mb-6">Choose a Template</h2>
 
             {Object.entries(groupedTemplates).map(([category, categoryTemplates]) =>
               categoryTemplates.length > 0 ? (
@@ -779,12 +779,12 @@ For questions or to proceed, please contact our team.
                   <h3 className="text-sm font-bold text-neutral-900 uppercase tracking-widest mb-4">
                     {categoryLabels[category] || category}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
                     {categoryTemplates.map((template: DocumentTemplate) => (
                       <button
                         key={template.id}
                         onClick={() => handleSelectTemplate(template)}
-                        className="flex items-start gap-4 p-5 rounded-2xl border border-neutral-200/60 bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all text-left cursor-pointer"
+                        className="flex items-start gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border border-neutral-200/60 bg-white shadow-sm hover:shadow-md hover:border-primary/20 transition-all text-left cursor-pointer"
                       >
                         <div className="w-12 h-12 bg-primary-fixed rounded-xl flex items-center justify-center flex-shrink-0">
                           <span className="text-2xl">{template.icon}</span>
@@ -806,7 +806,7 @@ For questions or to proceed, please contact our team.
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Demo Banner (compact) */}
           {isDemo && (
-            <div className="mx-8 mt-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3 flex items-center justify-between">
+            <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 sm:mt-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-3 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-amber-600" style={{ fontSize: '20px' }}>
                   auto_awesome
@@ -822,7 +822,7 @@ For questions or to proceed, please contact our team.
           )}
 
           {error && (
-            <div className="mx-8 mt-4 bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-xl flex items-start gap-3">
+            <div className="mx-4 sm:mx-6 lg:mx-8 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 sm:px-5 py-3 rounded-xl flex items-start gap-3">
               <span className="material-symbols-outlined flex-shrink-0 mt-0.5" style={{ fontSize: '20px' }}>
                 error
               </span>
@@ -833,7 +833,7 @@ For questions or to proceed, please contact our team.
             </div>
           )}
 
-          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 p-8 gap-8 overflow-hidden">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 p-4 sm:p-6 lg:p-8 gap-4 sm:gap-6 lg:gap-8 overflow-hidden">
             {/* Left Column: Controls */}
             <section className="overflow-y-auto pr-2 space-y-6">
               <div className="bg-white p-6 rounded-xl border border-neutral-200/60">
@@ -940,7 +940,7 @@ For questions or to proceed, please contact our team.
                   </div>
 
                   {/* Sections & Style */}
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider ml-1">
                         Include Sections
@@ -1112,8 +1112,8 @@ For questions or to proceed, please contact our team.
 
                 {/* AI Refine Toolbar */}
                 {draft && !isGenerating && (
-                  <div className="px-4 py-2.5 border-b border-neutral-100 bg-gradient-to-r from-violet-50/50 to-white flex-shrink-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="px-3 sm:px-4 py-2 sm:py-2.5 border-b border-neutral-100 bg-gradient-to-r from-violet-50/50 to-white flex-shrink-0">
+                    <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                       <span className="material-symbols-outlined text-sm text-violet-400">auto_awesome</span>
                       <span className="text-[11px] font-bold text-violet-500 uppercase tracking-wider mr-1">AI Refine</span>
                       {refineActions.map((action) => (
@@ -1127,7 +1127,7 @@ For questions or to proceed, please contact our team.
                           {action.label}
                         </button>
                       ))}
-                      <div className="flex-1 flex items-center gap-2 ml-2">
+                      <div className="w-full sm:flex-1 flex items-center gap-2 sm:ml-2 mt-1.5 sm:mt-0">
                         <input
                           type="text"
                           value={customRefinePrompt}
@@ -1139,7 +1139,7 @@ For questions or to proceed, please contact our team.
                           }}
                           placeholder="Custom instruction..."
                           disabled={isRefining}
-                          className="flex-1 min-w-[140px] px-3 py-1 text-xs bg-white border border-neutral-200 rounded-lg focus:ring-1 focus:ring-violet-300 focus:border-violet-300 outline-none placeholder:text-neutral-300 disabled:opacity-40"
+                          className="flex-1 min-w-0 px-3 py-1 text-xs bg-white border border-neutral-200 rounded-lg focus:ring-1 focus:ring-violet-300 focus:border-violet-300 outline-none placeholder:text-neutral-300 disabled:opacity-40"
                         />
                         {customRefinePrompt.trim() && (
                           <button
@@ -1166,7 +1166,7 @@ For questions or to proceed, please contact our team.
                   {(isGenerating || isRefining) && !draft?.draft ? (
                     <>
                       {/* Skeleton — only shown before first token arrives */}
-                      <div className="p-10 space-y-6">
+                      <div className="p-4 sm:p-6 lg:p-10 space-y-6">
                         <div className="space-y-4 animate-pulse">
                           <div className="h-8 bg-neutral-100 rounded-lg w-3/4" />
                           <div className="space-y-3">
@@ -1204,7 +1204,7 @@ For questions or to proceed, please contact our team.
                     </>
                   ) : draft ? (
                     activeTab === 'preview' ? (
-                      <div className="p-10">
+                      <div className="p-4 sm:p-6 lg:p-10">
                         <StreamingMarkdown text={draft.draft} variant="draft" isStreaming={isGenerating || isRefining} />
                       </div>
                     ) : activeTab === 'edit' ? (

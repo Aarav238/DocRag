@@ -47,6 +47,7 @@ export function ChatPage() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [expandedSources, setExpandedSources] = useState<Set<number>>(new Set());
+  const [showMobileDocs, setShowMobileDocs] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -146,9 +147,99 @@ export function ChatPage() {
   };
 
   return (
-    <div className="flex gap-5 h-[calc(100vh-12rem)] p-5 animate-fade-in">
-      {/* Left Sidebar */}
-      <div className="w-80 flex-shrink-0 flex flex-col bg-white rounded-2xl border border-neutral-200/60 overflow-hidden shadow-sm">
+    <div className="flex flex-col lg:flex-row gap-3 sm:gap-5 h-[calc(100vh-8rem)] sm:h-[calc(100vh-12rem)] p-3 sm:p-5 animate-fade-in">
+      {/* Mobile document toggle */}
+      <button
+        type="button"
+        onClick={() => setShowMobileDocs(true)}
+        className="lg:hidden flex items-center gap-2 px-4 py-2.5 bg-white border border-neutral-200/60 rounded-xl shadow-sm text-sm font-medium text-neutral-700 shrink-0"
+      >
+        <span className="material-symbols-outlined text-violet-500 text-lg">description</span>
+        Documents
+        {selectedDocIds.length > 0 && (
+          <span className="ml-auto px-2 py-0.5 text-xs font-bold bg-violet-100 text-violet-600 rounded-full">
+            {selectedDocIds.length}
+          </span>
+        )}
+        <span className="material-symbols-outlined text-neutral-400 text-lg ml-auto">chevron_right</span>
+      </button>
+
+      {/* Mobile document overlay */}
+      {showMobileDocs && (
+        <div className="fixed inset-0 z-40 lg:hidden animate-fade-in">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setShowMobileDocs(false)} />
+          <div className="absolute bottom-0 left-0 right-0 max-h-[70vh] bg-white rounded-t-2xl border-t border-neutral-200/60 shadow-2xl flex flex-col animate-scale-in overflow-hidden">
+            <div className="p-4 border-b border-neutral-100 bg-gradient-to-r from-neutral-50 to-white flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-violet-100 border border-violet-200/50 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-violet-600 text-xl">description</span>
+                </div>
+                <div>
+                  <h3 className="font-headline font-bold text-neutral-900">Documents</h3>
+                  <p className="text-xs text-neutral-500">{documents.length} available</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowMobileDocs(false)}
+                className="p-2 rounded-lg text-neutral-400 hover:text-neutral-600 hover:bg-neutral-100 transition-colors cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-xl">close</span>
+              </button>
+            </div>
+            {documents.length > 0 && (
+              <div className="flex items-center justify-between px-4 py-2 border-b border-neutral-100">
+                <span className="text-sm text-neutral-500">
+                  {selectedDocIds.length > 0 ? (
+                    <span className="font-bold text-violet-600">{selectedDocIds.length} selected</span>
+                  ) : (
+                    'None selected'
+                  )}
+                </span>
+                <button
+                  onClick={handleSelectAll}
+                  className="text-sm text-violet-600 hover:text-violet-800 font-bold cursor-pointer"
+                >
+                  {selectedDocIds.length === documents.length ? 'Clear all' : 'Select all'}
+                </button>
+              </div>
+            )}
+            <div className="flex-1 overflow-y-auto p-3">
+              {isLoadingDocs ? (
+                <DocumentListSkeleton count={4} compact />
+              ) : documents.length === 0 ? (
+                <div className="flex flex-col items-center justify-center text-center py-8">
+                  <div className="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center mb-3">
+                    <span className="material-symbols-outlined text-neutral-400 text-2xl">description</span>
+                  </div>
+                  <p className="text-sm font-medium text-neutral-700">No documents</p>
+                  <p className="text-xs text-neutral-500 mt-1">Upload documents to start chatting</p>
+                </div>
+              ) : (
+                <DocumentList
+                  documents={documents}
+                  selectable
+                  selectedIds={selectedDocIds}
+                  onSelectionChange={setSelectedDocIds}
+                  compact
+                />
+              )}
+            </div>
+            {selectedDocIds.length > 0 && (
+              <div className="p-3 border-t border-violet-100 bg-violet-50/50">
+                <button
+                  onClick={() => setShowMobileDocs(false)}
+                  className="w-full py-2.5 rounded-xl primary-gradient text-white text-sm font-bold shadow-lg shadow-violet-500/15 cursor-pointer"
+                >
+                  Done — {selectedDocIds.length} selected
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Left Sidebar — desktop only */}
+      <div className="hidden lg:flex w-80 flex-shrink-0 flex-col bg-white rounded-2xl border border-neutral-200/60 overflow-hidden shadow-sm">
         {/* Sidebar Header */}
         <div className="p-4 border-b border-neutral-100 bg-gradient-to-r from-neutral-50 to-white">
           <div className="flex items-center gap-3 mb-3">
@@ -213,13 +304,13 @@ export function ChatPage() {
         )}
       </div>
 
-      {/* Right Chat Area */}
-      <div className="flex-1 flex flex-col bg-white rounded-2xl border border-neutral-200/60 overflow-hidden shadow-sm">
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col bg-white rounded-2xl border border-neutral-200/60 overflow-hidden shadow-sm min-h-0">
         {/* Top Bar */}
-        <div className="p-4 border-b border-neutral-100 glass-panel flex items-center justify-between">
-          <div>
-            <h1 className="font-headline text-lg font-black text-neutral-900">Document Q&A</h1>
-            <p className="text-sm text-neutral-500">
+        <div className="p-3 sm:p-4 border-b border-neutral-100 glass-panel flex items-center justify-between">
+          <div className="min-w-0">
+            <h1 className="font-headline text-base sm:text-lg font-black text-neutral-900">Document Q&A</h1>
+            <p className="text-xs sm:text-sm text-neutral-500 truncate">
               {selectedDocIds.length > 0
                 ? `Chatting with ${selectedDocIds.length} document(s)`
                 : 'Select documents or chat with all'}
@@ -228,17 +319,17 @@ export function ChatPage() {
           {messages.length > 0 && (
             <button
               onClick={handleClearChat}
-              className="flex items-center gap-2 px-3 py-1.5 text-sm text-neutral-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
+              className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 text-sm text-neutral-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer shrink-0"
               title="Clear chat history"
             >
               <span className="material-symbols-outlined text-lg">delete</span>
-              Clear
+              <span className="hidden sm:inline">Clear</span>
             </button>
           )}
         </div>
 
         {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-4">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-5 space-y-4">
           {messages.length === 0 && (
             <div className="text-center text-neutral-500 py-16">
               <div className="w-16 h-16 rounded-2xl bg-violet-50 border border-violet-100/50 flex items-center justify-center mx-auto mb-4">
@@ -255,7 +346,7 @@ export function ChatPage() {
               className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} animate-fade-in-up`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl p-4 ${
+                className={`max-w-[90%] sm:max-w-[80%] rounded-2xl p-3 sm:p-4 ${
                   message.role === 'user'
                     ? 'primary-gradient text-white shadow-lg shadow-violet-500/15'
                     : 'bg-neutral-50 text-on-surface border border-neutral-100'
@@ -334,22 +425,22 @@ export function ChatPage() {
         )}
 
         {/* Input Area */}
-        <form onSubmit={handleSubmit} className="p-4 border-t border-neutral-100">
-          <div className="flex gap-3">
+        <form onSubmit={handleSubmit} className="p-3 sm:p-4 border-t border-neutral-100">
+          <div className="flex gap-2 sm:gap-3">
             <input
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask a question..."
-              className="flex-1 px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 outline-none bg-white text-neutral-900 placeholder:text-neutral-400 transition-all"
+              className="flex-1 px-3 sm:px-4 py-3 border border-neutral-200 rounded-xl focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 outline-none bg-white text-neutral-900 placeholder:text-neutral-400 transition-all text-sm sm:text-base"
             />
             <button
               type="submit"
               disabled={isLoading || !input.trim()}
-              className="flex items-center gap-2 px-6 py-3 primary-gradient text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-lg shadow-violet-500/15"
+              className="flex items-center gap-2 px-4 sm:px-6 py-3 primary-gradient text-white rounded-xl font-bold hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-lg shadow-violet-500/15"
             >
               <span className="material-symbols-outlined text-lg">send</span>
-              Send
+              <span className="hidden sm:inline">Send</span>
             </button>
           </div>
         </form>

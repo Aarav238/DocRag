@@ -97,7 +97,7 @@ export function FileUpload({ onUpload, isUploading, uploadingFileName }: FileUpl
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`relative bg-white border-2 border-dashed rounded-2xl p-14 text-center transition-all duration-300 ${
+        className={`relative bg-white border-2 border-dashed rounded-2xl p-8 sm:p-14 text-center transition-all duration-300 ${
           hasError
             ? 'border-red-300 bg-red-50/30'
             : isDragging

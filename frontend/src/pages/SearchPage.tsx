@@ -41,10 +41,10 @@ export function SearchPage() {
   };
 
   return (
-    <div className="p-8 lg:p-10 max-w-7xl mx-auto animate-fade-in">
+    <div className="p-4 sm:p-6 lg:p-10 max-w-7xl mx-auto animate-fade-in">
       {/* Header */}
-      <header className="mb-10">
-        <h2 className="font-headline text-3xl font-black text-neutral-900 tracking-tight mb-2">
+      <header className="mb-6 sm:mb-10">
+        <h2 className="font-headline text-2xl sm:text-3xl font-black text-neutral-900 tracking-tight mb-2">
           Semantic Search
         </h2>
         <p className="text-neutral-500 max-w-2xl leading-relaxed">
@@ -62,14 +62,14 @@ export function SearchPage() {
       )}
 
       {/* Search Bar */}
-      <form onSubmit={handleSearch} className="mb-10">
+      <form onSubmit={handleSearch} className="mb-6 sm:mb-10">
         <div className="relative group">
           {/* Glow effect */}
           <div className="absolute -inset-1 bg-gradient-to-r from-violet-500/15 via-cyan-500/15 to-violet-500/15 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-500" />
 
-          <div className="relative flex items-center gap-3 p-2 pl-4 bg-white shadow-lg shadow-neutral-200/50 rounded-2xl border border-neutral-200/60 group-focus-within:border-violet-300 transition-colors">
+          <div className="relative flex items-center gap-2 sm:gap-3 p-2 pl-3 sm:pl-4 bg-white shadow-lg shadow-neutral-200/50 rounded-2xl border border-neutral-200/60 group-focus-within:border-violet-300 transition-colors">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 ring-1 ring-violet-200/60"
+              className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 ring-1 ring-violet-200/60"
               aria-hidden
             >
               <span className="material-symbols-outlined text-[22px] text-violet-600 leading-none">find_in_page</span>
@@ -79,22 +79,22 @@ export function SearchPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Ask anything about your documents..."
-              className="flex-1 bg-transparent border-none focus:ring-0 text-lg font-medium text-neutral-900 placeholder:text-neutral-400 outline-none px-2 py-3"
+              className="flex-1 bg-transparent border-none focus:ring-0 text-base sm:text-lg font-medium text-neutral-900 placeholder:text-neutral-400 outline-none px-1 sm:px-2 py-3"
             />
             <button
               type="submit"
               disabled={isSearching || !query.trim()}
-              className="primary-gradient text-white px-8 py-3.5 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-violet-500/20"
+              className="primary-gradient text-white px-4 sm:px-8 py-3 sm:py-3.5 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-violet-500/20 shrink-0"
             >
               <span className="material-symbols-outlined text-xl">search</span>
-              {isSearching ? 'Searching...' : 'Search'}
+              <span className="hidden sm:inline">{isSearching ? 'Searching...' : 'Search'}</span>
             </button>
           </div>
         </div>
       </form>
 
       {/* Grid Layout */}
-      <div className="grid grid-cols-12 gap-8">
+      <div className="grid grid-cols-12 gap-4 sm:gap-6 lg:gap-8">
         {/* Left filter sidebar */}
         <aside className="col-span-12 lg:col-span-3">
           <div className="bg-white rounded-2xl p-6 sticky top-24 border border-neutral-200/60 shadow-sm">
@@ -212,7 +212,7 @@ export function SearchPage() {
                 return (
                   <div
                     key={result.chunk_id}
-                    className="bg-white rounded-2xl p-7 border border-neutral-200/60 card-hover animate-fade-in-up"
+                    className="bg-white rounded-2xl p-4 sm:p-7 border border-neutral-200/60 card-hover animate-fade-in-up"
                     style={{ animationDelay: `${i * 60}ms` }}
                   >
                     {/* Card header */}
@@ -249,7 +249,7 @@ export function SearchPage() {
                     </p>
 
                     {/* Action buttons */}
-                    <div className="flex items-center gap-1 mt-5 pt-4 border-t border-neutral-100">
+                    <div className="flex flex-wrap items-center gap-1 mt-4 sm:mt-5 pt-3 sm:pt-4 border-t border-neutral-100">
                       <button
                         type="button"
                         onClick={async () => {
