@@ -225,8 +225,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <ThemeToggle className="hidden sm:inline-flex" />
-            <ThemeToggle variant="compact" className="sm:hidden" />
+            <ThemeToggle variant="compact" />
             {/* Settings dropdown */}
             <div className="relative" ref={settingsRef}>
               <button
