@@ -87,7 +87,7 @@ export function Layout({ children }: LayoutProps) {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background text-on-surface flex">
+    <div className="flex min-h-screen min-w-0 bg-background text-on-surface">
       {/* ── Mobile sidebar backdrop ── */}
       {mobileNavOpen && (
         <div
@@ -191,7 +191,7 @@ export function Layout({ children }: LayoutProps) {
       </aside>
 
       {/* ── Main Content ── */}
-      <div className="lg:ml-[260px] flex min-h-screen flex-1 flex-col">
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:ml-[260px]">
         {/* Top bar */}
         <header className="sticky top-0 z-30 flex w-full flex-wrap items-center justify-between gap-3 border-b border-neutral-200/60 dark:border-outline-variant glass-panel px-4 sm:px-6 lg:px-8 py-3.5">
           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3 sm:gap-4 lg:gap-6">
@@ -208,7 +208,7 @@ export function Layout({ children }: LayoutProps) {
             <h2 className="font-headline text-lg sm:text-xl font-extrabold tracking-tight text-neutral-900 dark:text-on-surface truncate">
               {pageTitle}
             </h2>
-            <div className="hidden sm:flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="hidden min-h-[2.125rem] flex-wrap content-center items-center gap-2 sm:flex sm:gap-3">
               {indexedCount > 0 && (
                 <span className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-200/60 bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-700">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
@@ -227,11 +227,11 @@ export function Layout({ children }: LayoutProps) {
           <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle variant="compact" />
             {/* Settings dropdown */}
-            <div className="relative" ref={settingsRef}>
+            <div className="relative flex items-center" ref={settingsRef}>
               <button
                 type="button"
                 onClick={() => setSettingsOpen((v) => !v)}
-                className={`rounded-xl p-2.5 transition-all active:scale-95 cursor-pointer ${
+                className={`inline-flex items-center justify-center rounded-xl p-2.5 transition-all active:scale-95 cursor-pointer ${
                   settingsOpen
                     ? 'bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-300'
                     : 'text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 dark:text-on-surface-variant dark:hover:bg-surface-container-high dark:hover:text-on-surface'
@@ -305,7 +305,7 @@ export function Layout({ children }: LayoutProps) {
               )}
             </div>
 
-            <div className="ml-1 sm:ml-2">
+            <div className="ml-1 flex items-center sm:ml-2">
               <UserButton
                 afterSignOutUrl="/"
                 appearance={{
@@ -320,7 +320,7 @@ export function Layout({ children }: LayoutProps) {
           </div>
         </header>
 
-        <main className="min-h-0 flex-1">{children}</main>
+        <main className="min-h-0 min-w-0 flex-1">{children}</main>
       </div>
     </div>
   );

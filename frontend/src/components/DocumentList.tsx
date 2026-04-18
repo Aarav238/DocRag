@@ -306,119 +306,132 @@ export function DocumentList({
               </div>
             )}
 
-            <div className="relative flex items-center gap-4">
-              {canSelect && (
-                <div className="flex-shrink-0">
-                  <div
-                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors cursor-pointer ${
-                      isSelected
-                        ? 'bg-violet-600 border-violet-600'
-                        : 'border-neutral-300 group-hover:border-violet-400'
-                    }`}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleSelection(doc.doc_id);
-                    }}
-                  >
-                    {isSelected && (
-                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              <FileIcon fileType={doc.file_type} />
-
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-neutral-900 truncate" title={doc.file_name}>
-                  {doc.file_name}
-                </p>
-                <p className="text-xs text-neutral-400 mt-1">
-                  {getFileExtension(doc.file_type, doc.file_name).toUpperCase()} · {new Date(doc.created_at).toLocaleString('en-IN', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true,
-                    timeZone: 'Asia/Kolkata',
-                  })}
-                </p>
-              </div>
-
-              <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${config.bgColor} ${config.color}`}>
-                <StatusIcon status={doc.status} />
-                <span className="text-sm font-bold whitespace-nowrap">{config.label}</span>
-              </div>
-
-              {doc.status === 'indexed' && (
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  {doc.file_type.includes('pdf') && (
-                    <button
-                      type="button"
-                      disabled={busyDocId === doc.doc_id}
-                      onClick={async (e) => {
+            <div className="relative flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              {/* Row 1: identity — never forces horizontal overflow with trailer below on narrow screens */}
+              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+                {canSelect && (
+                  <div className="shrink-0">
+                    <div
+                      className={`flex h-5 w-5 cursor-pointer items-center justify-center rounded-md border-2 transition-colors ${
+                        isSelected
+                          ? 'border-violet-600 bg-violet-600'
+                          : 'border-neutral-300 group-hover:border-violet-400'
+                      }`}
+                      onClick={(e) => {
                         e.stopPropagation();
-                        setBusyDocId(doc.doc_id);
-                        try {
-                          await api.openDocumentView(doc.doc_id);
-                        } catch (err) {
-                          console.error(err);
-                          alert(err instanceof Error ? err.message : 'Could not open document');
-                        } finally {
-                          setBusyDocId(null);
-                        }
+                        toggleSelection(doc.doc_id);
                       }}
-                      className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-violet-500 hover:bg-violet-50 transition-colors cursor-pointer disabled:opacity-40"
-                      title="View document"
                     >
-                      <span className="material-symbols-outlined text-xl">visibility</span>
-                    </button>
+                      {isSelected && (
+                        <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <FileIcon fileType={doc.file_type} />
+
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-bold text-neutral-900" title={doc.file_name}>
+                    {doc.file_name}
+                  </p>
+                  <p className="mt-1 text-xs text-neutral-400">
+                    {getFileExtension(doc.file_type, doc.file_name).toUpperCase()} ·{' '}
+                    {new Date(doc.created_at).toLocaleString('en-IN', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                      hour12: true,
+                      timeZone: 'Asia/Kolkata',
+                    })}
+                  </p>
+                </div>
+              </div>
+
+              {/* Row 2 (mobile) / inline trailer (sm+): status + actions — keeps toolbar off the title row */}
+              <div className="flex w-full min-w-0 shrink-0 items-center justify-between gap-2 border-t border-neutral-200/60 pt-3 dark:border-outline-variant sm:w-auto sm:flex-nowrap sm:border-t-0 sm:pt-0">
+                <div
+                  className={`flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 sm:gap-2 sm:px-3 ${config.bgColor} ${config.color}`}
+                >
+                  <StatusIcon status={doc.status} />
+                  <span className="whitespace-nowrap text-[10px] font-bold leading-tight sm:text-sm">{config.label}</span>
+                </div>
+
+                <div className="flex shrink-0 items-center gap-0.5 sm:gap-1">
+                  {doc.status === 'indexed' && (
+                    <div className="flex items-center gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+                      {doc.file_type.includes('pdf') && (
+                        <button
+                          type="button"
+                          disabled={busyDocId === doc.doc_id}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setBusyDocId(doc.doc_id);
+                            try {
+                              await api.openDocumentView(doc.doc_id);
+                            } catch (err) {
+                              console.error(err);
+                              alert(err instanceof Error ? err.message : 'Could not open document');
+                            } finally {
+                              setBusyDocId(null);
+                            }
+                          }}
+                          className="shrink-0 cursor-pointer rounded-lg p-2 text-neutral-400 transition-colors hover:bg-violet-50 hover:text-violet-500 disabled:opacity-40"
+                          title="View document"
+                        >
+                          <span className="material-symbols-outlined text-xl">visibility</span>
+                        </button>
+                      )}
+
+                      <button
+                        type="button"
+                        disabled={busyDocId === doc.doc_id}
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          setBusyDocId(doc.doc_id);
+                          try {
+                            await api.downloadDocument(doc.doc_id, doc.file_name);
+                          } catch (err) {
+                            console.error(err);
+                            alert(err instanceof Error ? err.message : 'Download failed');
+                          } finally {
+                            setBusyDocId(null);
+                          }
+                        }}
+                        className="shrink-0 cursor-pointer rounded-lg p-2 text-neutral-400 transition-colors hover:bg-violet-50 hover:text-violet-500 disabled:opacity-40"
+                        title="Download document"
+                      >
+                        <span className="material-symbols-outlined text-xl">download</span>
+                      </button>
+
+                      {onDelete && (
+                        <button
+                          type="button"
+                          onClick={(e) => handleDeleteClick(e, doc)}
+                          className="shrink-0 cursor-pointer rounded-lg p-2 text-neutral-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                          title="Delete document"
+                        >
+                          <span className="material-symbols-outlined text-xl">delete</span>
+                        </button>
+                      )}
+                    </div>
                   )}
 
-                  <button
-                    type="button"
-                    disabled={busyDocId === doc.doc_id}
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      setBusyDocId(doc.doc_id);
-                      try {
-                        await api.downloadDocument(doc.doc_id, doc.file_name);
-                      } catch (err) {
-                        console.error(err);
-                        alert(err instanceof Error ? err.message : 'Download failed');
-                      } finally {
-                        setBusyDocId(null);
-                      }
-                    }}
-                    className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-violet-500 hover:bg-violet-50 transition-colors cursor-pointer disabled:opacity-40"
-                    title="Download document"
-                  >
-                    <span className="material-symbols-outlined text-xl">download</span>
-                  </button>
-
-                  {onDelete && (
+                  {onDelete && doc.status !== 'uploaded' && doc.status !== 'indexed' && (
                     <button
+                      type="button"
                       onClick={(e) => handleDeleteClick(e, doc)}
-                      className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                      className="shrink-0 cursor-pointer rounded-lg p-2 text-neutral-400 opacity-100 transition-opacity hover:bg-red-50 hover:text-red-500 sm:opacity-0 sm:group-hover:opacity-100"
                       title="Delete document"
                     >
                       <span className="material-symbols-outlined text-xl">delete</span>
                     </button>
                   )}
                 </div>
-              )}
-
-              {onDelete && doc.status !== 'uploaded' && doc.status !== 'indexed' && (
-                <button
-                  onClick={(e) => handleDeleteClick(e, doc)}
-                  className="flex-shrink-0 p-2 rounded-lg text-neutral-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 cursor-pointer"
-                  title="Delete document"
-                >
-                  <span className="material-symbols-outlined text-xl">delete</span>
-                </button>
-              )}
+              </div>
             </div>
 
             {isProcessing && (

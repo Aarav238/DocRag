@@ -94,27 +94,29 @@ export function UploadPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-full animate-fade-in">
-      <div className="mx-auto w-full max-w-6xl space-y-6 sm:space-y-8 p-4 sm:p-6 lg:p-8">
+    <div className="flex min-h-full min-w-0 flex-col animate-fade-in">
+      <div className="mx-auto w-full min-w-0 max-w-6xl space-y-6 p-3 sm:space-y-8 sm:p-6 lg:p-8">
         {/* Success Message */}
         {successMessage && (
-          <div className="border border-emerald-200 bg-emerald-50 px-5 py-4 rounded-xl flex items-center gap-3 animate-scale-in">
-            <span className="material-symbols-outlined text-emerald-600 flex-shrink-0" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
-            <span className="text-emerald-800 font-medium">{successMessage}</span>
+          <div className="flex animate-scale-in items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3.5 sm:items-center sm:px-5 sm:py-4">
+            <span className="material-symbols-outlined shrink-0 text-emerald-600" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+            <span className="min-w-0 flex-1 text-sm font-medium text-emerald-800 sm:text-base">{successMessage}</span>
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="border border-red-200 bg-red-50 px-5 py-4 rounded-xl flex items-start gap-3 animate-scale-in">
-            <span className="material-symbols-outlined text-red-500 flex-shrink-0 mt-0.5">error</span>
-            <div>
+          <div className="flex animate-scale-in items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3.5 sm:px-5 sm:py-4">
+            <span className="material-symbols-outlined mt-0.5 shrink-0 text-red-500">error</span>
+            <div className="min-w-0 flex-1 pr-1">
               <p className="font-bold text-red-800">Upload failed</p>
-              <p className="text-sm text-red-700 mt-1">{error}</p>
+              <p className="mt-1 break-words text-sm text-red-700">{error}</p>
             </div>
             <button
+              type="button"
               onClick={() => setError(null)}
-              className="ml-auto text-red-400 hover:text-red-600 cursor-pointer"
+              className="-m-1 shrink-0 rounded-lg p-1.5 text-red-400 hover:bg-red-100/60 hover:text-red-600 cursor-pointer"
+              aria-label="Dismiss error"
             >
               <span className="material-symbols-outlined text-xl">close</span>
             </button>
@@ -129,11 +131,11 @@ export function UploadPage() {
         />
 
         {/* Documents List */}
-        <div>
-          <div className="flex items-center justify-between mb-5">
+        <div className="min-w-0">
+          <div className="mb-5 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <h2 className="font-headline text-lg font-bold text-neutral-900">Your Documents</h2>
             {documents.length > 0 && (
-              <span className="text-sm font-medium text-neutral-400">{documents.length} total</span>
+              <span className="text-sm font-medium text-neutral-400 sm:shrink-0">{documents.length} total</span>
             )}
           </div>
           {isLoadingDocs ? (

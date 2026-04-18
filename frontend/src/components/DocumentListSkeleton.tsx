@@ -11,21 +11,25 @@ interface DocumentListSkeletonProps {
 function SkeletonCard({ index }: { index: number }) {
   return (
     <div
-      className="relative bg-white rounded-2xl border border-neutral-200/60 p-5 shadow-sm animate-pulse"
+      className="relative min-w-0 animate-pulse rounded-2xl border border-neutral-200/60 bg-white p-5 shadow-sm"
       style={{ animationDelay: `${index * 100}ms` }}
     >
-      <div className="flex items-center gap-4">
-        {/* File icon placeholder */}
-        <div className="w-12 h-12 rounded-xl bg-neutral-100" />
-
-        {/* Text placeholders */}
-        <div className="flex-1 min-w-0 space-y-2">
-          <div className="h-4 bg-neutral-100 rounded-lg w-3/5" />
-          <div className="h-3 bg-neutral-100 rounded-lg w-2/5" />
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <div className="h-12 w-12 shrink-0 rounded-xl bg-neutral-100" />
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="h-4 w-3/5 rounded-lg bg-neutral-100" />
+            <div className="h-3 w-2/5 rounded-lg bg-neutral-100" />
+          </div>
         </div>
-
-        {/* Status badge placeholder */}
-        <div className="h-7 w-16 bg-neutral-100 rounded-lg" />
+        <div className="flex w-full items-center justify-between gap-2 border-t border-neutral-200/60 pt-3 sm:w-auto sm:border-t-0 sm:pt-0">
+          <div className="h-7 w-20 shrink-0 rounded-lg bg-neutral-100" />
+          <div className="flex shrink-0 gap-1.5">
+            <div className="h-9 w-9 rounded-lg bg-neutral-100" />
+            <div className="h-9 w-9 rounded-lg bg-neutral-100" />
+            <div className="h-9 w-9 rounded-lg bg-neutral-100" />
+          </div>
+        </div>
       </div>
     </div>
   );
