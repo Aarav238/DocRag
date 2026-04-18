@@ -103,6 +103,13 @@ export function DraftPage() {
 
   const docSelectorRef = useRef<HTMLDivElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Inline selection-aware refine
+  const [selectionRange, setSelectionRange] = useState<{ start: number; end: number } | null>(null);
+  const [selectionPrompt, setSelectionPrompt] = useState('');
+  const [showSelectionPopover, setShowSelectionPopover] = useState(false);
+  const selectionStreamRef = useRef<{ start: number; originalEnd: number; inserted: number } | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -297,6 +304,65 @@ export function DraftPage() {
       setDraft((prev) => prev ? { ...prev, draft: draft.draft } : prev);
     } finally {
       setIsRefining(false);
+    }
+  };
+
+  // Edit ONLY the selected snippet in-place, streaming the replacement.
+  const handleRefineSelection = async (refineInstruction: string) => {
+    if (!draft || !selectionRange || isRefining || isGenerating) return;
+    const { start, end } = selectionRange;
+    if (start === end || !refineInstruction.trim()) return;
+
+    const originalDraft = draft.draft;
+    const selectedText = originalDraft.slice(start, end);
+
+    setIsRefining(true);
+    setError(null);
+    setShowSelectionPopover(false);
+
+    // Clear the selection range immediately so we splice against a stable anchor
+    setDraft((prev) => prev ? { ...prev, draft: originalDraft.slice(0, start) + originalDraft.slice(end) } : prev);
+    selectionStreamRef.current = { start, originalEnd: end, inserted: 0 };
+
+    try {
+      await api.refineDraftStream(
+        originalDraft,
+        refineInstruction,
+        (chunk) => {
+          setDraft((prev) => {
+            if (!prev) return prev;
+            const ref = selectionStreamRef.current;
+            if (!ref) return prev;
+            const insertAt = ref.start + ref.inserted;
+            const next = prev.draft.slice(0, insertAt) + chunk + prev.draft.slice(insertAt);
+            ref.inserted += chunk.length;
+            return { ...prev, draft: next };
+          });
+        },
+        selectedText,
+      );
+      setSelectionPrompt('');
+      setSelectionRange(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to refine selection');
+      setDraft((prev) => prev ? { ...prev, draft: originalDraft } : prev);
+    } finally {
+      selectionStreamRef.current = null;
+      setIsRefining(false);
+    }
+  };
+
+  const handleTextareaSelect = () => {
+    const ta = editTextareaRef.current;
+    if (!ta) return;
+    const start = ta.selectionStart;
+    const end = ta.selectionEnd;
+    if (start !== end) {
+      setSelectionRange({ start, end });
+      setShowSelectionPopover(true);
+    } else {
+      setSelectionRange(null);
+      setShowSelectionPopover(false);
     }
   };
 
@@ -1208,19 +1274,79 @@ For questions or to proceed, please contact our team.
                         <StreamingMarkdown text={draft.draft} variant="draft" isStreaming={isGenerating || isRefining} />
                       </div>
                     ) : activeTab === 'edit' ? (
-                      <div className="flex flex-col h-full">
+                      <div className="flex flex-col h-full relative">
                         <div className="flex items-center gap-2 px-6 py-2 border-b border-neutral-100 bg-neutral-50/50 flex-shrink-0">
                           <span className="material-symbols-outlined text-sm text-neutral-400">edit_note</span>
                           <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Editing Draft</span>
+                          {selectionRange && !isRefining && (
+                            <span className="text-[11px] text-violet-500 font-semibold ml-2">
+                              {selectionRange.end - selectionRange.start} chars selected
+                            </span>
+                          )}
                           <span className="text-xs text-neutral-300 ml-auto">{draft.draft.length} chars</span>
                         </div>
                         <textarea
+                          ref={editTextareaRef}
                           value={draft.draft}
                           onChange={(e) => setDraft({ ...draft, draft: e.target.value })}
-                          className="flex-1 w-full p-6 text-sm text-on-surface font-mono leading-relaxed bg-white resize-none outline-none placeholder:text-neutral-300"
+                          onSelect={handleTextareaSelect}
+                          onBlur={() => {
+                            // keep popover open if user is clicking into the prompt input
+                            setTimeout(() => {
+                              const active = document.activeElement as HTMLElement | null;
+                              if (!active?.closest('[data-selection-popover]')) {
+                                setShowSelectionPopover(false);
+                              }
+                            }, 100);
+                          }}
+                          disabled={isRefining}
+                          className="flex-1 w-full p-6 text-sm text-on-surface font-mono leading-relaxed bg-white resize-none outline-none placeholder:text-neutral-300 disabled:opacity-80 disabled:cursor-wait"
                           placeholder="Start writing your draft..."
                           spellCheck={false}
                         />
+                        {showSelectionPopover && selectionRange && !isRefining && (
+                          <div
+                            data-selection-popover
+                            className="absolute top-12 right-6 z-30 w-80 bg-white rounded-xl shadow-2xl shadow-violet-300/30 border border-violet-200 p-3 animate-in fade-in slide-in-from-top-2"
+                          >
+                            <div className="flex items-center gap-1.5 mb-2">
+                              <span className="material-symbols-outlined text-sm text-violet-500">auto_awesome</span>
+                              <span className="text-[11px] font-bold text-violet-600 uppercase tracking-wider">Edit selection with AI</span>
+                            </div>
+                            <input
+                              type="text"
+                              autoFocus
+                              value={selectionPrompt}
+                              onChange={(e) => setSelectionPrompt(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && selectionPrompt.trim()) {
+                                  e.preventDefault();
+                                  handleRefineSelection(selectionPrompt.trim());
+                                } else if (e.key === 'Escape') {
+                                  setShowSelectionPopover(false);
+                                }
+                              }}
+                              placeholder="e.g. make this more concise"
+                              className="w-full px-3 py-2 text-xs bg-neutral-50 border border-neutral-200 rounded-lg focus:ring-1 focus:ring-violet-300 focus:border-violet-300 outline-none placeholder:text-neutral-300"
+                            />
+                            <div className="flex items-center justify-between mt-2">
+                              <span className="text-[10px] text-neutral-400">Enter to apply · Esc to cancel</span>
+                              <button
+                                onClick={() => selectionPrompt.trim() && handleRefineSelection(selectionPrompt.trim())}
+                                disabled={!selectionPrompt.trim()}
+                                className="px-3 py-1 text-[11px] font-semibold text-white bg-violet-500 rounded-md hover:bg-violet-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                Apply
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                        {isRefining && (
+                          <div className="absolute top-12 right-6 z-30 bg-white rounded-full shadow-lg border border-violet-200 px-3 py-1.5 flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-violet-500 rounded-full animate-pulse" />
+                            <span className="text-[11px] font-semibold text-violet-600">Editing selection…</span>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="p-6">

@@ -358,6 +358,16 @@ REFINE_SYSTEM_PROMPT = """You are a professional document editor. The user will 
 Return the complete revised document in markdown. Do not add commentary or explanations — output only the revised document."""
 
 
+REFINE_SELECTION_SYSTEM_PROMPT = """You are a professional document editor performing an inline edit on a SELECTED snippet from a larger document.
+
+Rules:
+- Return ONLY the replacement text for the selected snippet — no surrounding context, no document framing.
+- Preserve the surrounding document's voice, tense, and formatting conventions (markdown, punctuation, capitalization).
+- Do NOT wrap output in quotes, code fences, or commentary. Do NOT repeat the selection verbatim before the replacement.
+- If the selection is a partial sentence, return a partial sentence. If it's a full paragraph, return a full paragraph. Match the shape.
+- Apply ONLY the requested change."""
+
+
 async def refine_draft_stream(
     current_draft: str,
     instruction: str,
@@ -384,6 +394,48 @@ Apply this change and return the complete revised document:""",
         messages=messages,
         temperature=0.3,
         max_tokens=4000,
+        stream=True,
+    )
+
+    async for chunk in stream:
+        delta = chunk.choices[0].delta
+        if delta.content:
+            yield delta.content
+
+
+async def refine_selection_stream(
+    full_draft: str,
+    selection: str,
+    instruction: str,
+) -> AsyncGenerator[str, None]:
+    """Stream a replacement for a selected snippet within a larger draft."""
+    messages = [
+        {"role": "system", "content": REFINE_SELECTION_SYSTEM_PROMPT},
+        {
+            "role": "user",
+            "content": f"""FULL DOCUMENT (for context only — do not return this):
+
+{full_draft}
+
+---
+
+SELECTED SNIPPET TO EDIT (return ONLY the replacement for this exact snippet):
+
+{selection}
+
+---
+
+Editing instruction: {instruction}
+
+Return only the replacement text for the selected snippet:""",
+        },
+    ]
+
+    stream = await client.chat.completions.create(
+        model=settings.openai_chat_model,
+        messages=messages,
+        temperature=0.3,
+        max_tokens=2000,
         stream=True,
     )
 

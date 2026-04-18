@@ -181,11 +181,12 @@ export const api = {
     draft: string,
     instruction: string,
     onChunk: (text: string) => void,
+    selection?: string,
   ): Promise<void> {
     const response = await authFetch(`${API_BASE}/draft/refine/stream`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ draft, instruction }),
+      body: JSON.stringify({ draft, instruction, selection }),
     });
     if (!response.ok) {
       const error = await response.json().catch(() => ({ detail: 'An error occurred' }));
