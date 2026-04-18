@@ -128,7 +128,7 @@ export function GuidePage() {
                 className="relative flex flex-col h-full bg-white p-6 sm:p-8 rounded-2xl border border-neutral-200/60 shadow-sm group card-hover overflow-hidden animate-fade-in-up"
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                <span className="absolute -bottom-4 -right-2 text-[7rem] font-black text-neutral-100 leading-none select-none pointer-events-none">
+                <span className="absolute -bottom-4 -right-2 text-[7rem] font-black leading-none text-neutral-100 dark:text-on-surface/[0.055] select-none pointer-events-none">
                   {step.number}
                 </span>
 
