@@ -98,7 +98,7 @@ const bestPractices = [
 
 export function GuidePage() {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white dark:bg-background">
       <MarketingHeader showTryDemo={false} />
 
       <div className="mx-auto w-full max-w-5xl space-y-10 sm:space-y-16 px-4 sm:px-8 pb-6 sm:pb-8 pt-24 sm:pt-28 lg:px-12 lg:pb-12">
@@ -173,7 +173,7 @@ export function GuidePage() {
         </section>
 
         {/* Technical Pipeline */}
-        <section className="relative overflow-hidden rounded-2xl border border-neutral-200/60 bg-gradient-to-br from-neutral-50 via-white to-violet-50/30 p-4 shadow-sm sm:p-8 lg:p-10">
+        <section className="relative overflow-hidden rounded-2xl border border-neutral-200/60 dark:border-outline-variant bg-gradient-to-br from-neutral-50 via-white to-violet-50/30 dark:from-surface-container-low dark:via-surface-container dark:to-violet-500/10 p-4 shadow-sm sm:p-8 lg:p-10">
           <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-violet-200/20 blur-[80px]" />
           <div className="pointer-events-none absolute -bottom-20 -left-16 h-56 w-56 rounded-full bg-cyan-200/15 blur-[80px]" />
 
@@ -199,12 +199,12 @@ export function GuidePage() {
               </aside>
             </div>
 
-            {/* Flow strip */}
-            <div className="rounded-xl border border-neutral-200/60 bg-white/80 px-3 py-4 sm:px-5 sm:py-5">
-              <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-[0.18em] text-neutral-400 sm:mb-4">
+            {/* Flow strip — solid surface in dark so blurs behind do not read through label + chips */}
+            <div className="relative z-[1] flex flex-col gap-3 rounded-xl border border-neutral-200/60 bg-white px-3 py-4 sm:gap-4 sm:px-5 sm:py-5 dark:border-outline-variant">
+              <p className="shrink-0 text-center text-[10px] font-bold uppercase leading-normal tracking-[0.18em] text-neutral-400 dark:text-on-surface-variant">
                 End-to-end flow
               </p>
-              <div className="flex items-center justify-center gap-0 overflow-x-auto pb-1 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <div className="flex w-full min-w-0 items-center justify-center gap-0 overflow-x-auto [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div className="flex min-w-min items-center gap-1 sm:gap-1.5">
                   {['Files', 'Chunks', 'Vectors', 'Retrieval', 'Answer'].map((label, i) => (
                     <Fragment key={label}>
@@ -213,7 +213,7 @@ export function GuidePage() {
                           chevron_right
                         </span>
                       )}
-                      <span className="shrink-0 rounded-lg bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700 ring-1 ring-violet-100/80 sm:px-3 sm:text-sm">
+                      <span className="shrink-0 rounded-lg bg-violet-50 px-2.5 py-1 text-xs font-bold text-violet-700 ring-1 ring-violet-100/80 dark:ring-violet-500/35 sm:px-3 sm:text-sm">
                         {label}
                       </span>
                     </Fragment>
@@ -235,7 +235,7 @@ export function GuidePage() {
                     </span>
                   </div>
                   <div
-                    className={`mb-4 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${stage.gradient} shadow-lg ${stage.shadow}`}
+                    className={`mb-4 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br ${stage.gradient} shadow-lg ${stage.shadow} dark:shadow-[0_6px_20px_-10px_rgb(0_0_0_/_0.22)]`}
                   >
                     <span className="material-symbols-outlined text-2xl text-white" style={{ fontVariationSettings: "'FILL' 1" }}>
                       {stage.icon}
@@ -336,7 +336,7 @@ export function GuidePage() {
         </section>
 
         {/* CTA */}
-        <section className="rounded-2xl p-6 sm:p-10 lg:p-14 text-center space-y-6 relative overflow-hidden bg-gradient-to-br from-violet-50 via-white to-cyan-50 border border-violet-200/50">
+        <section className="rounded-2xl p-6 sm:p-10 lg:p-14 text-center space-y-6 relative overflow-hidden bg-gradient-to-br from-violet-50 via-white to-cyan-50 dark:from-violet-500/10 dark:via-surface-container dark:to-cyan-500/10 border border-violet-200/50 dark:border-violet-500/20">
           <div className="absolute inset-0 dot-grid opacity-30" />
           <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-violet-200/30 blur-[80px] pointer-events-none" />
           <div className="absolute -bottom-20 -left-20 w-56 h-56 rounded-full bg-cyan-200/20 blur-[80px] pointer-events-none" />

@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(html.dark, html.dark *));
+
 @theme {
   /* ── Primary: Deep Violet ── */
   --color-primary: #5b21b6;
@@ -76,13 +78,200 @@
   --font-label: 'Outfit', sans-serif;
 }
 
+/* ── Dark theme token overrides ─────────────────────────────────────────
+   Every Tailwind utility built off these tokens (bg-surface, text-on-surface,
+   border-outline-variant, etc.) switches automatically when .dark is on <html>. */
+html.dark {
+  /* Surfaces — deep violet-tinged slate */
+  --color-surface: #0a0f1e;
+  --color-surface-bright: #111827;
+  --color-surface-dim: #05070f;
+  --color-surface-container: #111827;
+  --color-surface-container-low: #0d1321;
+  --color-surface-container-high: #1a2232;
+  --color-surface-container-highest: #263143;
+  --color-surface-container-lowest: #05070f;
+  --color-surface-variant: #1e293b;
+  --color-surface-tint: #8b5cf6;
+  --color-on-surface: #f5f5f5;
+  --color-on-surface-variant: #94a3b8;
+  --color-background: #0a0f1e;
+  --color-on-background: #f5f5f5;
+
+  /* Primary lifts slightly for better contrast on dark */
+  --color-primary: #8b5cf6;
+  --color-primary-container: #7c3aed;
+  --color-primary-fixed: #2e1065;
+  --color-primary-fixed-dim: #4c1d95;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #ede9fe;
+  --color-on-primary-fixed: #ede9fe;
+  --color-on-primary-fixed-variant: #c4b5fd;
+
+  /* Secondary — brighter cyan on dark */
+  --color-secondary: #22d3ee;
+  --color-secondary-container: #0891b2;
+  --color-secondary-fixed: #083344;
+  --color-secondary-fixed-dim: #155e75;
+  --color-on-secondary: #042f2e;
+  --color-on-secondary-container: #cffafe;
+
+  /* Tertiary — warmer amber on dark */
+  --color-tertiary: #fbbf24;
+  --color-tertiary-container: #d97706;
+  --color-tertiary-fixed: #451a03;
+  --color-tertiary-fixed-dim: #78350f;
+
+  /* Outline — visible but quiet on dark */
+  --color-outline: #475569;
+  --color-outline-variant: #1e293b;
+
+  /* Error — accessible on dark */
+  --color-error: #f87171;
+  --color-error-container: #450a0a;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #fecaca;
+
+  /* Inverse */
+  --color-inverse-surface: #f5f5f5;
+  --color-inverse-on-surface: #0a0f1e;
+  --color-inverse-primary: #5b21b6;
+}
+
 /* ── Base ── */
 body {
   font-family: 'Outfit', sans-serif;
-  background-color: #fafafa;
-  color: #0a0a0a;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DARK-MODE MIGRATION SHIM
+   ─────────────────────────────────────────────────────────────
+   Many pages were authored against hardcoded light neutrals
+   (bg-white, text-neutral-*, border-neutral-*). Rather than add
+   `dark:` variants to 400+ call sites, we remap those classes to
+   our dark tokens under html.dark. Individual components can still
+   override by adding explicit `dark:` utilities — those win via
+   class order.
+   ───────────────────────────────────────────────────────────── */
+html.dark .bg-white { background-color: var(--color-surface-container); }
+html.dark .bg-neutral-50 { background-color: var(--color-surface-container-low); }
+html.dark .bg-neutral-50\/50 { background-color: color-mix(in oklab, var(--color-surface-container-low) 50%, transparent); }
+html.dark .bg-neutral-100 { background-color: var(--color-surface-container-high); }
+html.dark .bg-neutral-200 { background-color: var(--color-surface-container-highest); }
+
+html.dark .text-neutral-900 { color: var(--color-on-surface); }
+html.dark .text-neutral-800 { color: var(--color-on-surface); }
+html.dark .text-neutral-700 { color: #e2e8f0; }
+html.dark .text-neutral-600 { color: #cbd5e1; }
+html.dark .text-neutral-500 { color: #94a3b8; }
+html.dark .text-neutral-400 { color: #64748b; }
+html.dark .text-neutral-300 { color: #475569; }
+
+html.dark .border-neutral-100 { border-color: var(--color-outline-variant); }
+html.dark .border-neutral-200 { border-color: var(--color-outline-variant); }
+html.dark .border-neutral-200\/60,
+html.dark .border-neutral-200\/70 { border-color: color-mix(in oklab, var(--color-outline-variant) 70%, transparent); }
+html.dark .border-neutral-300 { border-color: var(--color-outline); }
+
+/* Tinted surface backgrounds — soften for dark */
+html.dark .bg-violet-50 { background-color: color-mix(in oklab, #8b5cf6 14%, transparent); }
+html.dark .bg-violet-50\/50 { background-color: color-mix(in oklab, #8b5cf6 8%, transparent); }
+html.dark .bg-emerald-50 { background-color: color-mix(in oklab, #10b981 14%, transparent); }
+html.dark .bg-amber-50 { background-color: color-mix(in oklab, #f59e0b 14%, transparent); }
+html.dark .bg-red-50 { background-color: color-mix(in oklab, #ef4444 14%, transparent); }
+html.dark .bg-cyan-50 { background-color: color-mix(in oklab, #06b6d4 14%, transparent); }
+html.dark .bg-sky-50 { background-color: color-mix(in oklab, #0ea5e9 14%, transparent); }
+
+/* Opacity-suffixed neutral surfaces */
+html.dark .bg-white\/60 { background-color: color-mix(in oklab, var(--color-surface-container) 60%, transparent); }
+html.dark .bg-white\/70 { background-color: color-mix(in oklab, var(--color-surface-container) 70%, transparent); }
+html.dark .bg-white\/80 { background-color: color-mix(in oklab, var(--color-surface-container) 80%, transparent); }
+html.dark .bg-white\/95 { background-color: color-mix(in oklab, var(--color-surface-container) 95%, transparent); }
+html.dark .bg-neutral-50\/80 { background-color: color-mix(in oklab, var(--color-surface-container-low) 80%, transparent); }
+html.dark .bg-neutral-50\/60 { background-color: color-mix(in oklab, var(--color-surface-container-low) 60%, transparent); }
+html.dark .bg-neutral-100\/50 { background-color: color-mix(in oklab, var(--color-surface-container-high) 50%, transparent); }
+
+/* Violet / cyan decorative washes — dim for dark */
+html.dark .bg-violet-100 { background-color: color-mix(in oklab, #8b5cf6 20%, transparent); }
+html.dark .bg-violet-100\/40 { background-color: color-mix(in oklab, #8b5cf6 10%, transparent); }
+html.dark .bg-violet-100\/60 { background-color: color-mix(in oklab, #8b5cf6 14%, transparent); }
+html.dark .bg-violet-200 { background-color: color-mix(in oklab, #8b5cf6 22%, transparent); }
+html.dark .bg-violet-200\/25 { background-color: color-mix(in oklab, #8b5cf6 10%, transparent); }
+html.dark .bg-violet-200\/30 { background-color: color-mix(in oklab, #8b5cf6 12%, transparent); }
+html.dark .bg-violet-50\/20 { background-color: color-mix(in oklab, #8b5cf6 6%, transparent); }
+html.dark .bg-violet-50\/60 { background-color: color-mix(in oklab, #8b5cf6 10%, transparent); }
+html.dark .bg-cyan-100 { background-color: color-mix(in oklab, #06b6d4 20%, transparent); }
+html.dark .bg-cyan-200\/25 { background-color: color-mix(in oklab, #06b6d4 10%, transparent); }
+html.dark .bg-cyan-200\/30 { background-color: color-mix(in oklab, #06b6d4 12%, transparent); }
+
+/* Gradient stops used in landing feature tiles */
+html.dark .from-violet-100 { --tw-gradient-from: color-mix(in oklab, #8b5cf6 22%, transparent); }
+html.dark .from-violet-100\/40 { --tw-gradient-from: color-mix(in oklab, #8b5cf6 10%, transparent); }
+html.dark .to-cyan-50 { --tw-gradient-to: color-mix(in oklab, #06b6d4 14%, transparent); }
+html.dark .to-cyan-50\/30 { --tw-gradient-to: color-mix(in oklab, #06b6d4 8%, transparent); }
+html.dark .via-white { --tw-gradient-via: var(--color-surface-container); }
+
+/* Border tints */
+html.dark .border-violet-200 { border-color: color-mix(in oklab, #8b5cf6 40%, transparent); }
+html.dark .border-violet-100 { border-color: color-mix(in oklab, #8b5cf6 28%, transparent); }
+html.dark .border-violet-100\/60 { border-color: color-mix(in oklab, #8b5cf6 22%, transparent); }
+html.dark .border-violet-200\/30 { border-color: color-mix(in oklab, #8b5cf6 24%, transparent); }
+html.dark .border-violet-200\/40 { border-color: color-mix(in oklab, #8b5cf6 28%, transparent); }
+html.dark .border-violet-200\/50 { border-color: color-mix(in oklab, #8b5cf6 32%, transparent); }
+html.dark .border-neutral-200\/50 { border-color: color-mix(in oklab, var(--color-outline-variant) 60%, transparent); }
+html.dark .border-neutral-100\/60 { border-color: color-mix(in oklab, var(--color-outline-variant) 55%, transparent); }
+html.dark .border-violet-200\/60 { border-color: color-mix(in oklab, #8b5cf6 28%, transparent); }
+html.dark .border-emerald-200 { border-color: color-mix(in oklab, #10b981 40%, transparent); }
+html.dark .border-emerald-200\/60 { border-color: color-mix(in oklab, #10b981 28%, transparent); }
+html.dark .border-amber-200 { border-color: color-mix(in oklab, #f59e0b 40%, transparent); }
+html.dark .border-amber-200\/60 { border-color: color-mix(in oklab, #f59e0b 28%, transparent); }
+html.dark .border-red-200 { border-color: color-mix(in oklab, #ef4444 40%, transparent); }
+
+/* Violet text on tinted chips reads better as lighter violet on dark */
+html.dark .text-violet-700 { color: #c4b5fd; }
+html.dark .text-violet-600 { color: #a78bfa; }
+html.dark .text-violet-500 { color: #a78bfa; }
+html.dark .text-violet-400 { color: #c4b5fd; }
+html.dark .text-emerald-700 { color: #6ee7b7; }
+html.dark .text-emerald-600 { color: #34d399; }
+html.dark .text-amber-700 { color: #fcd34d; }
+html.dark .text-amber-600 { color: #fbbf24; }
+html.dark .text-red-700 { color: #fca5a5; }
+html.dark .text-red-600 { color: #f87171; }
+html.dark .text-cyan-700 { color: #67e8f9; }
+html.dark .text-cyan-600 { color: #22d3ee; }
+
+/* Gradient-from utilities keyed to light surfaces */
+html.dark .from-violet-50\/50 { --tw-gradient-from: color-mix(in oklab, #8b5cf6 8%, transparent); }
+html.dark .to-white { --tw-gradient-to: var(--color-surface-container); }
+html.dark .from-white { --tw-gradient-from: var(--color-surface-container); }
+
+/* Divider & subtle shadows */
+html.dark .shadow-neutral-200\/50 { --tw-shadow-color: rgba(0, 0, 0, 0.5); }
+html.dark .ring-neutral-200 { --tw-ring-color: var(--color-outline-variant); }
+
+/* Hover/focus ring tints */
+html.dark .hover\:bg-neutral-50:hover { background-color: var(--color-surface-container-low); }
+html.dark .hover\:bg-neutral-100:hover { background-color: var(--color-surface-container-high); }
+html.dark .hover\:bg-violet-50:hover { background-color: color-mix(in oklab, #8b5cf6 18%, transparent); }
+
+/* Placeholder & input backgrounds */
+html.dark .placeholder\:text-neutral-300::placeholder,
+html.dark .placeholder\:text-neutral-400::placeholder { color: #475569; }
+
+/* Briefly transition surfaces during theme flip — toggled on <html> by ThemeContext */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *::before,
+html.theme-transitioning *::after {
+  transition: background-color 220ms ease, border-color 220ms ease,
+              color 220ms ease, fill 220ms ease, stroke 220ms ease !important;
+  transition-delay: 0s !important;
 }
 
 .font-headline {
@@ -120,6 +309,10 @@ body {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
 }
 
+html.dark .glass-panel {
+  background: rgba(17, 24, 39, 0.72);
+}
+
 .glass-dark {
   background: rgba(10, 15, 30, 0.85);
   backdrop-filter: blur(20px) saturate(180%);
@@ -142,6 +335,10 @@ body {
 .dot-grid {
   background-image: radial-gradient(circle, #d4d4d4 1px, transparent 1px);
   background-size: 24px 24px;
+}
+
+html.dark .dot-grid {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
 }
 
 .dot-grid-dark {
@@ -311,6 +508,14 @@ html {
   background: #a3a3a3;
 }
 
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
 /* Dark scrollbar for sidebar */
 .dark-scroll::-webkit-scrollbar-thumb {
   background: #334155;
@@ -331,6 +536,11 @@ html {
 ::selection {
   background-color: #ede9fe;
   color: #1e0a4e;
+}
+
+html.dark ::selection {
+  background-color: #4c1d95;
+  color: #ede9fe;
 }
 
 /* ═══════════════════════════════════════════════════
@@ -657,4 +867,63 @@ html {
 .markdown-body--draft p {
   margin-bottom: 16px;
   color: #525252;
+}
+
+/* ── Dark theme overrides for hardcoded markdown + prose colors ── */
+html.dark .markdown-body .markdown-h1,
+html.dark .markdown-body .markdown-h2,
+html.dark .markdown-body .markdown-h3,
+html.dark .markdown-body .markdown-strong,
+html.dark .markdown-body .markdown-th {
+  color: #f5f5f5;
+}
+
+html.dark .markdown-body p,
+html.dark .markdown-body--draft p {
+  color: #cbd5e1;
+}
+
+html.dark .markdown-body .inline-code {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #f5f5f5;
+}
+
+html.dark .markdown-body .code-block {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .markdown-body .markdown-blockquote {
+  color: #94a3b8;
+  background: rgba(139, 92, 246, 0.08);
+  border-left-color: #8b5cf6;
+}
+
+html.dark .markdown-body .markdown-table-wrapper {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html.dark .markdown-body .markdown-th {
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom-color: rgba(255, 255, 255, 0.12);
+}
+
+html.dark .markdown-body .markdown-td {
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+html.dark .markdown-body .markdown-link {
+  color: #a78bfa;
+}
+
+html.dark .markdown-body .markdown-hr {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .markdown-body--draft .markdown-h1 {
+  border-bottom-color: #1e293b;
+}
+
+html.dark .markdown-body--draft .markdown-h2::before {
+  background: #8b5cf6;
 }

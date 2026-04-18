@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { ThemeToggle } from './ThemeToggle';
 
 interface MarketingHeaderProps {
   showTryDemo?: boolean;
@@ -11,7 +12,7 @@ export function MarketingHeader({ showTryDemo = true }: MarketingHeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-neutral-200/50">
+    <nav className="fixed top-0 inset-x-0 z-50 glass-panel border-b border-neutral-200/50 dark:border-outline-variant">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16 gap-4">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
@@ -39,6 +40,7 @@ export function MarketingHeader({ showTryDemo = true }: MarketingHeaderProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <ThemeToggle variant="compact" />
           <SignedOut>
             {showTryDemo && (
               <button

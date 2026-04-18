@@ -93,7 +93,7 @@ export function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-on-surface">
+    <div className="min-h-screen bg-white dark:bg-background text-on-surface">
       <MarketingHeader />
 
       {/* ═══════════ Hero ═══════════ */}
@@ -191,7 +191,7 @@ export function LandingPage() {
 
       {/* ═══════════ Features ═══════════ */}
       <section id="features" className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-neutral-50/80" />
+        <div className="absolute inset-0 bg-neutral-50/80 dark:bg-surface-container-low/70" />
         <div className="absolute inset-0 dot-grid opacity-30" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -213,7 +213,7 @@ export function LandingPage() {
                 style={{ animationDelay: `${i * 80}ms` }}
               >
                 <div
-                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.gradient} ${f.shadow} shadow-lg flex items-center justify-center mb-6`}
+                  className={`w-12 h-12 rounded-xl bg-gradient-to-br ${f.gradient} shadow-lg ${f.shadow} dark:shadow-[0_6px_20px_-10px_rgb(0_0_0_/_0.22)] flex items-center justify-center mb-6`}
                 >
                   <span className="material-symbols-outlined text-white text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
                     {f.icon}
@@ -234,7 +234,7 @@ export function LandingPage() {
       </section>
 
       {/* ═══════════ How It Works ═══════════ */}
-      <section id="how-it-works" className="py-24 bg-white">
+      <section id="how-it-works" className="py-24 bg-white dark:bg-background">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -369,7 +369,7 @@ export function LandingPage() {
 
       {/* ═══════════ Use Cases ═══════════ */}
       <section id="use-cases" className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-neutral-50/80" />
+        <div className="absolute inset-0 bg-neutral-50/80 dark:bg-surface-container-low/70" />
         <div className="absolute inset-0 dot-grid opacity-30" />
 
         <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
@@ -455,7 +455,7 @@ answer = llm.chat(
       </section>
 
       {/* ═══════════ Bottom CTA ═══════════ */}
-      <section className="py-24 bg-white relative overflow-hidden">
+      <section className="py-24 bg-white dark:bg-background relative overflow-hidden">
         <div className="absolute inset-0 dot-grid opacity-20" />
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] rounded-full bg-violet-100/40 blur-[100px] pointer-events-none" />
 
@@ -498,7 +498,7 @@ answer = llm.chat(
       </section>
 
       {/* ═══════════ Footer ═══════════ */}
-      <footer className="bg-neutral-50 border-t border-neutral-200/60 py-16">
+      <footer className="bg-neutral-50 dark:bg-surface-container-low border-t border-neutral-200/60 dark:border-outline-variant py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-10">
             <div className="col-span-2 md:col-span-1">
